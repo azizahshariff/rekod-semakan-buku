@@ -142,11 +142,11 @@
         function drawAdminRecord() {
             document.getElementById('filterPanel').style.display = 'block';
             document.getElementById('btnSearchArea').style.display = 'none';
-            document.getElementById('inputContainer').innerHTML = '<strong>Ringkasan Aktiviti Pentadbir (Mengikut Guru & Subjek)</strong>';
+            document.getElementById('inputContainer').innerHTML = '<strong>Ringkasan Aktiviti Pentadbir (Mengikut Tarikh & Guru)</strong>';
             
-            // Query dikemaskini untuk mengambil Lajur S (Pentadbir), T (Jawatan), C (Guru), dan F (Subjek)
-            // Kita susun mengikut Nama Pentadbir
-            let q = encodeURIComponent(`SELECT S, T, C, F, COUNT(B) GROUP BY S, T, C, F LABEL S 'Penyemak', T 'Jawatan', C 'Guru Disemak', F 'Mata Pelajaran', COUNT(B) 'Bil. Semakan'`);
+            // Query dikemaskini untuk mengambil:
+            // S (Pentadbir), T (Jawatan), B (Tarikh), C (Guru), F (Subjek)
+            let q = encodeURIComponent(`SELECT S, T, B, C, F ORDER BY B DESC LABEL S 'Penyemak', T 'Jawatan', B 'Tarikh', C 'Guru Disemak', F 'Mata Pelajaran'`);
             let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
 
             fetch(url).then(r => r.text()).then(t => {
@@ -155,23 +155,24 @@
                 
                 dt.addColumn('string', 'Penyemak'); 
                 dt.addColumn('string', 'Jawatan'); 
+                dt.addColumn('string', 'Tarikh'); 
                 dt.addColumn('string', 'Guru Disemak'); 
                 dt.addColumn('string', 'Mata Pelajaran'); 
-                dt.addColumn('number', 'Bil. Semakan');
 
                 let rows = j.table.rows.map(r => [
                     r.c[0] ? r.c[0].v : "", 
                     r.c[1] ? r.c[1].v : "", 
-                    r.c[2] ? r.c[2].v : "", 
+                    r.c[2] ? r.c[2].f : "", // Menggunakan .f untuk format tarikh yang cantik
                     r.c[3] ? r.c[3].v : "", 
-                    r.c[4] ? r.c[4].v : 0
+                    r.c[4] ? r.c[4].v : ""
                 ]);
 
                 dt.addRows(rows);
                 new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {
                     width: '100%', 
-                    pageSize: 10,
-                    alternatingRowStyle: true
+                    pageSize: 15,
+                    alternatingRowStyle: true,
+                    allowHtml: true
                 });
             });
         }
