@@ -3,124 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengurusan Unit Kurikulum - SK Simpang Rengam</title>
+    <title>Sistem Kurikulum - SK Simpang Rengam</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
-        :root { 
-            --primary-blue: #1e3a8a; 
-            --bg-light: #f4f7fa; 
-            --sidebar-width: 260px;
-        }
+        :root { --primary: #1e3a8a; --bg: #f4f7fa; --sidebar: 260px; }
+        body { background-color: var(--bg); display: flex; height: 100vh; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
         
-        body { background-color: var(--bg-light); display: flex; height: 100vh; overflow: hidden; font-family: 'Segoe UI', Roboto, sans-serif; }
-
-        /* SIDEBAR STYLING */
-        .sidebar { width: var(--sidebar-width); background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 0; box-shadow: 2px 0 10px rgba(0,0,0,0.02); }
+        .sidebar { width: var(--sidebar); background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
         .sidebar-header { text-align: center; padding: 30px 20px; }
-        .sidebar-header img { width: 50px; margin-bottom: 10px; }
-        .sidebar-header .app-name { color: #2563eb; font-weight: 700; font-size: 0.9rem; line-height: 1.2; }
-        .sidebar-header .school-name { color: #64748b; font-size: 0.7rem; font-weight: 600; margin-top: 4px; }
-
-        .nav-group-title { padding: 20px 25px 10px; font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-link { padding: 12px 25px; display: flex; align-items: center; color: #64748b; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: 0.2s; margin: 2px 15px; border-radius: 8px; }
-        .nav-link i { width: 25px; font-size: 1rem; }
-        .nav-link:hover { background: #f1f5f9; color: var(--primary-blue); }
-        .nav-link.is-active { background: #eff6ff; color: #1e40af; font-weight: 700; }
-
-        /* MAIN CONTENT AREA */
-        .main-content { flex-grow: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
-        .header-section { text-align: center; margin-bottom: 50px; width: 100%; }
-        .header-section img { width: 70px; margin-bottom: 15px; }
-        .header-section h1 { color: #1e3a8a; font-size: 2.2rem; font-weight: 800; }
-        .header-section p { color: #64748b; font-size: 1rem; }
-
-        /* CARD MENU STYLING */
-        .card-menu { display: flex; justify-content: center; gap: 20px; width: 100%; max-width: 900px; flex-wrap: wrap; }
-        .menu-item { 
-            background: white; border-radius: 20px; padding: 40px 20px; text-align: center; cursor: pointer; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 200px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid transparent;
-        }
-        .menu-item:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); border-color: #dbeafe; }
-        .menu-item i { font-size: 2.2rem; margin-bottom: 15px; display: block; }
-        .menu-item span { font-weight: 700; font-size: 0.75rem; color: #334155; text-transform: uppercase; }
-
-        /* SUB-MENU SEARCH STYLING */
-        #searchMenu { display: none; }
+        .sidebar-header img { width: 55px; }
         
-        /* FILTER PANEL */
-        #filterPanel { display: none; background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 800px; margin-top: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .nav-link { padding: 12px 25px; display: flex; align-items: center; color: #64748b; cursor: pointer; font-size: 0.85rem; transition: 0.2s; border-radius: 8px; margin: 2px 15px; }
+        .nav-link:hover { background: #f1f5f9; color: var(--primary); }
+        .nav-link.is-active { background: #eff6ff; color: #1e40af; font-weight: 700; }
+        .nav-group-title { padding: 15px 25px 5px; font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
 
-        .footer-credit { margin-top: auto; padding: 20px; text-align: center; color: #cbd5e1; font-size: 0.65rem; }
+        .main-content { flex-grow: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
+        .header-section { text-align: center; margin-bottom: 40px; }
+        
+        .card-menu { display: flex; justify-content: center; gap: 20px; width: 100%; max-width: 900px; flex-wrap: wrap; }
+        .menu-item { background: white; border-radius: 18px; padding: 40px 20px; text-align: center; cursor: pointer; transition: 0.3s; width: 220px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .menu-item:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
+        .menu-item i { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+        .menu-item span { font-weight: 700; font-size: 0.85rem; color: #334155; text-transform: uppercase; }
+
+        #searchMenu { display: none; }
+        #filterPanel { display: none; background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 800px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         iframe { width: 100%; height: 85vh; border: none; border-radius: 15px; }
-
-        /* COLORS */
-        .icon-blue { color: #1e40af; }
-        .icon-red { color: #ef4444; }
-        .icon-orange { color: #f59e0b; }
-        .icon-green { color: #10b981; }
-        .icon-purple { color: #7c3aed; }
+        
+        .icon-isi { color: #1e40af; } .icon-semak { color: #ef4444; } .icon-arkib { color: #f59e0b; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <div class="sidebar-header">
-            <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" alt="Logo">
-            <p class="app-name">Rekod Semakan Buku</p>
-            <p class="school-name">SK SIMPANG RENGAM</p>
+            <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png">
+            <p style="font-weight: 700; color: var(--primary); font-size: 0.85rem; margin-top: 10px;">REKOD SEMAKAN BUKU</p>
         </div>
 
-        <div class="nav-link is-active" onclick="location.reload()"><i class="fas fa-home"></i> Laman Utama</div>
+        <div class="nav-link is-active" onclick="location.reload()"><i class="fas fa-home mr-3"></i> Laman Utama</div>
         
         <div class="nav-group-title">Menu Utama</div>
-        <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit"></i> Isi Laporan</div>
-        <div class="nav-link" onclick="showSearchMenu()"><i class="fas fa-search"></i> Semak Rekod</div>
-        <div class="nav-link" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')"><i class="fas fa-file-pdf"></i> Arkib PDF</div>
-
-        <div class="footer-credit">Sistem Inovasi Digital: D'SiRe © 2026</div>
+        <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit mr-3"></i> Isi Laporan</div>
+        <div class="nav-link" onclick="showSearchMenu()"><i class="fas fa-search mr-3"></i> Semak Rekod</div>
+        <div class="nav-link" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')"><i class="fas fa-file-pdf mr-3"></i> Arkib PDF</div>
     </div>
 
     <div class="main-content" id="mainArea">
-        <div class="header-section" id="headerSection">
-            <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png">
-            <h1>UNIT KURIKULUM</h1>
-            <p>SK Simpang Rengam • Rekod Semakan Buku Murid</p>
+        <div id="headerSection" class="header-section">
+            <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" width="70">
+            <h1 class="title is-3" style="color: var(--primary); margin-top: 10px;">PENGURUSAN UNIT KURIKULUM</h1>
+            <p class="subtitle is-6 has-text-grey">SK Simpang Rengam • Inovasi D'SiRe @2026</p>
         </div>
 
         <div class="card-menu" id="mainMenu">
             <div class="menu-item" onclick="loadFrame('halaman_semak_buku.html')">
-                <i class="fas fa-pencil-alt icon-blue"></i>
-                <span>ISI LAPORAN</span>
+                <i class="fas fa-pencil-alt icon-isi"></i><span>ISI LAPORAN</span>
             </div>
             <div class="menu-item" onclick="showSearchMenu()">
-                <i class="fas fa-search-plus icon-red"></i>
-                <span>SEMAK REKOD</span>
+                <i class="fas fa-search-plus icon-semak"></i><span>SEMAK REKOD</span>
             </div>
             <div class="menu-item" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')">
-                <i class="fas fa-file-pdf icon-orange"></i>
-                <span>ARKIB PDF</span>
+                <i class="fas fa-file-pdf icon-arkib"></i><span>ARKIB PDF</span>
             </div>
         </div>
 
         <div class="card-menu" id="searchMenu">
             <div class="menu-item" onclick="prepareFilter('GURU')">
-                <i class="fas fa-user-tie icon-blue"></i>
-                <span>NAMA GURU</span>
+                <i class="fas fa-user-tie has-text-link"></i><span>NAMA GURU</span>
             </div>
             <div class="menu-item" onclick="prepareFilter('SUBJEK')">
-                <i class="fas fa-book icon-green"></i>
-                <span>MATA PELAJARAN</span>
+                <i class="fas fa-book has-text-success"></i><span>MATA PELAJARAN</span>
             </div>
             <div class="menu-item" onclick="prepareFilter('TARIKH')">
-                <i class="fas fa-calendar-day icon-orange"></i>
-                <span>TARIKH</span>
+                <i class="fas fa-calendar-day has-text-warning"></i><span>TARIKH</span>
             </div>
             <div class="menu-item" onclick="drawAdminRecord()">
-                <i class="fas fa-user-shield icon-purple"></i>
-                <span>REKOD PENTADBIR</span>
+                <i class="fas fa-user-shield has-text-primary"></i><span>REKOD PENTADBIR</span>
             </div>
             <div style="width: 100%; text-align: center; margin-top: 20px;">
                 <button class="button is-text is-small" onclick="location.reload()"> Kembali ke Menu Utama</button>
@@ -130,7 +92,7 @@
         <div id="filterPanel">
             <div class="columns is-vcentered">
                 <div class="column is-8" id="inputContainer"></div>
-                <div class="column is-4" id="searchBtnContainer">
+                <div class="column is-4" id="btnSearchArea">
                     <button class="button is-link is-fullwidth is-rounded" onclick="drawTable()">CARI DATA</button>
                 </div>
             </div>
@@ -139,116 +101,75 @@
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxQCYfhi1mqkdIXpeynWeJ1d7Hj-DBs-_n2EHg0azbR3sos8H5HDH6UQhL3-9vgwJtozw/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby92WvNa46A3vuKQ3ZSpJgIcWXpOuYIlXzXBjWw2XE-pwBm4kv41-r8SGV1qXZHLi-hyQ/exec';
         const sheetID = '1T7GcIbxlqQiaBcjE7LaKAUzANhzzGtS--_xDyKXizCg';
-        let currentFilterMode = '';
+        let currentMode = '';
 
         function loadFrame(url) {
-            document.getElementById('headerSection').style.display = 'none';
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('searchMenu').style.display = 'none';
-            document.getElementById('filterPanel').style.display = 'none';
-            const content = `<div style="width:100%;"><button class="button is-small is-light mb-2" onclick="location.reload()"><i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard</button><iframe src="${url}"></iframe></div>`;
-            document.getElementById('mainArea').innerHTML = content;
+            document.getElementById('mainArea').innerHTML = `<div style="width:100%"><button class="button is-small is-light mb-2" onclick="location.reload()">← Kembali</button><iframe src="${url}"></iframe></div>`;
         }
 
         function showSearchMenu() {
-            document.getElementById('headerSection').style.display = 'block';
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('searchMenu').style.display = 'flex';
-            document.getElementById('filterPanel').style.display = 'none';
         }
 
         function prepareFilter(mode) {
-            currentFilterMode = mode;
+            currentMode = mode;
             document.getElementById('filterPanel').style.display = 'block';
-            document.getElementById('searchBtnContainer').style.display = 'block';
+            document.getElementById('btnSearchArea').style.display = 'block';
             const container = document.getElementById('inputContainer');
-            container.innerHTML = '<p class="is-size-7">Memuatkan senarai...</p>';
+            container.innerHTML = '<p class="is-size-7">Memuatkan data...</p>';
 
-            fetch(scriptURL).then(r => r.json()).then(d => {
+            fetch(scriptURL + "?getLists=true").then(r => r.json()).then(d => {
                 if (mode === 'GURU') {
                     let opts = d.guru.map(g => `<option value="${g}">${g}</option>`).join('');
-                    container.innerHTML = `<label class="label is-small">Pilih Nama Guru</label><div class="select is-fullwidth is-link"><select id="filterValue"><option value="">-- Senarai Guru --</option>${opts}</select></div>`;
+                    container.innerHTML = `<label class="label is-small">Nama Guru</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Nama --</option>${opts}</select></div>`;
                 } 
                 else if (mode === 'SUBJEK') {
                     let opts = d.subjek.map(s => `<option value="${s}">${s}</option>`).join('');
-                    container.innerHTML = `<label class="label is-small">Pilih Mata Pelajaran</label><div class="select is-fullwidth is-link"><select id="filterValue"><option value="">-- Senarai Subjek --</option>${opts}</select></div>`;
+                    container.innerHTML = `<label class="label is-small">Mata Pelajaran</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Subjek --</option>${opts}</select></div>`;
                 }
                 else if (mode === 'TARIKH') {
-                    container.innerHTML = `<label class="label is-small">Pilih Tarikh</label><input type="date" id="filterValue" class="input is-link">`;
+                    container.innerHTML = `<label class="label is-small">Tarikh</label><input type="date" id="fVal" class="input">`;
                 }
             });
         }
 
         google.charts.load('current', {'packages':['table']});
 
-        // FUNGSI BARU: PAPAR REKOD PENTADBIR
         function drawAdminRecord() {
             document.getElementById('filterPanel').style.display = 'block';
-            document.getElementById('inputContainer').innerHTML = '<h3 class="title is-6 has-text-primary">Ringkasan Laporan Pentadbir</h3>';
-            document.getElementById('searchBtnContainer').style.display = 'none';
-            document.getElementById('resultsTable').innerHTML = 'Menjana ringkasan data pentadbir...';
+            document.getElementById('btnSearchArea').style.display = 'none';
+            document.getElementById('inputContainer').innerHTML = '<strong>Ringkasan Aktiviti Pentadbir</strong>';
+            
+            let q = encodeURIComponent(`SELECT S, T, COUNT(B) GROUP BY S, T LABEL S 'Penyemak', T 'Jawatan', COUNT(B) 'Jumlah Rekod'`);
+            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
 
-            // Query untuk mendapatkan Lajur Pentadbir (H) dan Jawatan (I)
-            let query = `SELECT H, I, COUNT(B) GROUP BY H, I LABEL COUNT(B) 'Jumlah'`;
-            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(query)}&sheet=rekod_semakan`;
-
-            fetch(url).then(r => r.text()).then(txt => {
-                let json = JSON.parse(txt.substr(47).slice(0, -2));
+            fetch(url).then(r => r.text()).then(t => {
+                let j = JSON.parse(t.substr(47).slice(0,-2));
                 let dt = new google.visualization.DataTable();
-                dt.addColumn('string', 'Nama Pentadbir');
-                dt.addColumn('string', 'Jawatan');
-                dt.addColumn('number', 'Jumlah Semakan');
-
-                let rows = json.table.rows.map(r => [
-                    r.c[0]?.v || "Tiada Nama",
-                    r.c[1]?.v || "-",
-                    r.c[2]?.v || 0
-                ]);
-
-                dt.addRows(rows);
-                new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml: true, width: '100%'});
+                dt.addColumn('string', 'Penyemak'); dt.addColumn('string', 'Jawatan'); dt.addColumn('number', 'Jumlah Rekod');
+                dt.addRows(j.table.rows.map(r => [r.c[0].v, r.c[1].v, r.c[2].v]));
+                new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {width:'100%', pageSize: 10});
             });
         }
 
         function drawTable() {
-            const val = document.getElementById('filterValue').value;
-            if(!val) return;
-            
-            document.getElementById('resultsTable').innerHTML = 'Menyusun maklumat...';
-            
-            let query = "";
-            if(currentFilterMode === 'GURU') query = `SELECT B, C, D, E, F, Q, U WHERE C = '${val}'`;
-            if(currentFilterMode === 'SUBJEK') query = `SELECT B, C, D, E, F, Q, U WHERE F = '${val}'`;
-            if(currentFilterMode === 'TARIKH') {
-                let d = val.split('-');
-                query = `SELECT B, C, D, E, F, Q, U WHERE B = '${d[2]}/${d[1]}/${d[0]}'`;
-            }
+            const val = document.getElementById('fVal').value;
+            let q = "";
+            if(currentMode==='GURU') q = `SELECT B, C, F, Q, U WHERE C = '${val}'`;
+            if(currentMode==='SUBJEK') q = `SELECT B, C, F, Q, U WHERE F = '${val}'`;
+            if(currentMode==='TARIKH') { let d = val.split('-'); q = `SELECT B, C, F, Q, U WHERE B = '${d[2]}/${d[1]}/${d[0]}'`; }
 
-            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(query)}&sheet=rekod_semakan`;
+            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(q)}&sheet=rekod_semakan`;
 
-            fetch(url).then(r => r.text()).then(txt => {
-                let json = JSON.parse(txt.substr(47).slice(0, -2));
+            fetch(url).then(r => r.text()).then(t => {
+                let j = JSON.parse(t.substr(47).slice(0,-2));
                 let dt = new google.visualization.DataTable();
-                dt.addColumn('string', 'Tarikh');
-                dt.addColumn('string', 'Guru');
-                dt.addColumn('string', 'Kelas');
-                dt.addColumn('string', 'Subjek');
-                dt.addColumn('string', 'Skala');
-                dt.addColumn('string', 'Dokumen');
-
-                let rows = json.table.rows.map(r => [
-                    r.c[0] ? r.c[0].f : "",
-                    r.c[1]?.v || "",
-                    (r.c[2]?.v || "") + " " + (r.c[3]?.v || ""),
-                    r.c[4]?.v || "",
-                    r.c[5]?.v || "",
-                    r.c[6] ? `<a href="${r.c[6].v}" target="_blank" class="button is-small is-link is-outlined">LIHAT PDF</a>` : "Tiada"
-                ]);
-
-                dt.addRows(rows);
-                new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml: true, width: '100%', pageSize: 10});
+                dt.addColumn('string', 'Tarikh'); dt.addColumn('string', 'Guru'); dt.addColumn('string', 'Subjek'); dt.addColumn('string', 'Skala'); dt.addColumn('string', 'PDF');
+                dt.addRows(j.table.rows.map(r => [r.c[0].f, r.c[1].v, r.c[2].v, r.c[3].v, `<a href="${r.c[4].v}" target="_blank" class="button is-small is-link is-outlined">LIHAT</a>`]));
+                new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml:true, width:'100%', pageSize: 10});
             });
         }
     </script>
