@@ -3,118 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengurusan Unit Kurikulum - SK Simpang Rengam</title>
+    <title>Pengurusan Unit Kurikulum-SK Simpang Rengam</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
-        :root { --sidebar-bg: #f8f9fa; --active-color: #1e3a8a; --text-grey: #6c757d; }
+        :root { --sidebar-bg: #f8f9fa; --active-color: #1e3a8a; }
         body { background-color: #ffffff; display: flex; height: 100vh; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
-        
-        /* Sidebar Styles */
         .sidebar { width: 250px; background: var(--sidebar-bg); border-right: 1px solid #e9ecef; display: flex; flex-direction: column; padding: 20px 0; }
         .sidebar-header { text-align: center; padding: 0 20px 30px; border-bottom: 1px solid #dee2e6; margin-bottom: 20px; }
-        .sidebar-header img { width: 60px; margin-bottom: 10px; }
-        
-        .menu-label { padding: 0 25px; font-size: 0.75rem; color: var(--text-grey); text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; }
-        .nav-link { padding: 12px 25px; display: flex; align-items: center; color: #495057; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
-        .nav-link i { width: 25px; margin-right: 10px; font-size: 1.1rem; }
-        .nav-link:hover { background: #e9ecef; color: var(--active-color); }
-        .nav-link.is-active { background: #e9ecef; color: var(--active-color); font-weight: 600; border-left: 4px solid var(--active-color); }
-
-        /* Main Area */
-        .main-content { flex-grow: 1; overflow-y: auto; background: #ffffff; }
-        .container-fluid { padding: 40px; }
-        
-        .header-section { text-align: center; margin-bottom: 50px; }
-        .header-section img { width: 80px; margin-bottom: 15px; }
-        .header-section h1 { color: #1e3a8a; font-size: 2.5rem; font-weight: 800; margin-bottom: 5px; }
-        .header-section p { color: var(--text-grey); font-size: 1.1rem; }
-
-        /* Navigation Cards */
-        .card-menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; max-width: 1100px; margin: 0 auto; }
-        .menu-item { background: #ffffff; border: 1px solid #dee2e6; border-radius: 15px; padding: 30px 10px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .menu-item:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); border-color: var(--active-color); }
-        .menu-item i { font-size: 2.5rem; margin-bottom: 15px; display: block; }
-        .menu-item span { font-weight: bold; color: #343a40; text-transform: uppercase; font-size: 0.85rem; }
-
-        .footer-text { text-align: center; margin-top: 60px; color: #ced4da; font-size: 0.75rem; }
-        iframe { width: 100%; height: 90vh; border: none; }
+        .sidebar-header img { width: 60px; }
+        .nav-link { padding: 12px 25px; display: flex; align-items: center; color: #495057; cursor: pointer; font-size: 0.9rem; }
+        .nav-link:hover, .nav-link.is-active { background: #e9ecef; color: var(--active-color); font-weight: 600; }
+        .main-content { flex-grow: 1; overflow-y: auto; padding: 40px; }
+        .header-section { text-align: center; margin-bottom: 40px; }
+        .header-section h1 { color: #1e3a8a; font-size: 2.2rem; font-weight: 800; }
+        .card-menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
+        .menu-item { border: 1px solid #dee2e6; border-radius: 12px; padding: 25px 10px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .menu-item:hover { transform: translateY(-3px); border-color: var(--active-color); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .menu-item i { font-size: 2rem; margin-bottom: 10px; display: block; }
+        .menu-item span { font-weight: bold; font-size: 0.75rem; color: #343a40; }
+        .filter-box { background: #f1f5f9; padding: 20px; border-radius: 12px; display: none; }
+        iframe { width: 100%; height: 85vh; border: none; border-radius: 12px; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
         <div class="sidebar-header">
-            <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" alt="Logo Sekolah">
-            <p class="title is-6 mb-0" style="color: var(--primary)">Rekod Semakan Buku Murid</p>
-            <p class="is-size-7 has-text-weight-bold">SK SIMPANG RENGAM</p>
-        </div>
+            <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" alt="Logo">
         
-        <div class="nav-link is-active" onclick="location.reload()">
-            <i class="fas fa-home"></i> Laman Utama
+            <p class="is-size-7 has-text-weight-bold mt-2">SK SIMPANG RENGAM</p>
         </div>
-
-        <p class="menu-label">Pengurusan</p>
-        <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')">
-            <i class="fas fa-edit"></i> Isi Laporan
-        </div>
-
-        <p class="menu-label">Semakan Status</p>
-        <div class="nav-link" onclick="toggleFilter()">
-            <i class="fas fa-chart-bar"></i> Status Semakan
-        </div>
-
-        <p class="menu-label">Arkib</p>
-        <div class="nav-link" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')">
-            <i class="fas fa-file-pdf"></i> Laporan PDF
-        </div>
+        <div class="nav-link is-active" onclick="location.reload()"><i class="fas fa-home mr-2"></i> Laman Utama</div>
+        <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit mr-2"></i> Isi Laporan</div>
+        <div class="nav-link" onclick="toggleFilter()"><i class="fas fa-chart-bar mr-2"></i> Status Semakan</div>
+        <div class="nav-link" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')"><i class="fas fa-file-pdf mr-2"></i> Arkib PDF</div>
     </div>
 
     <div class="main-content" id="mainArea">
-        <div class="container-fluid">
-            
-            <div class="header-section">
-                <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" alt="Logo">
-                <h1>PENGURUSAN UNIT KURIKULUM</h1>
-                <p>SK Simpang Rengam • Rekod Semakan Buku Murid</p>
-            </div>
+        <div class="header-section">
+            <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" style="width:70px;">
+            <h1>REKOD SEMAKAN BUKU MURID</h1>
+            <p class="has-text-grey">SK Simpang Rengam • Unit Kurikulum</p>
+        </div>
 
-            <div class="card-menu">
-                <div class="menu-item" onclick="loadFrame('halaman_semak_buku.html')">
-                    <i class="fas fa-edit has-text-link"></i>
-                    <span>ISI LAPORAN</span>
-                </div>
-                <div class="menu-item" onclick="toggleFilter()">
-                    <i class="fas fa-list-check has-text-danger"></i>
-                    <span>STATUS SEMAKAN</span>
-                </div>
-                <div class="menu-item" onclick="window.open('https://docs.google.com/spreadsheets/d/1T7GcIbxlqQiaBcjE7LaKAUzANhzzGtS--_xDyKXizCg/edit', '_blank')">
-                    <i class="fas fa-calendar-alt has-text-warning"></i>
-                    <span>DATA SHEET</span>
-                </div>
-                <div class="menu-item" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')">
-                    <i class="fas fa-file-pdf has-text-info"></i>
-                    <span>ARKIB PDF</span>
-                </div>
-            </div>
+        <div class="card-menu">
+            <div class="menu-item" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit has-text-link"></i><span>ISI LAPORAN</span></div>
+            <div class="menu-item" onclick="toggleFilter()"><i class="fas fa-list-check has-text-danger"></i><span>STATUS SEMAKAN</span></div>
+            <div class="menu-item" onclick="window.open('https://docs.google.com/spreadsheets/d/1T7GcIbxlqQiaBcjE7LaKAUzANhzzGtS--_xDyKXizCg/edit', '_blank')"><i class="fas fa-table has-text-success"></i><span>DATA SHEET</span></div>
+            <div class="menu-item" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')"><i class="fas fa-file-pdf has-text-info"></i><span>ARKIB PDF</span></div>
+        </div>
 
-            <div id="filterPanel" style="display: none;" class="mt-6">
-                <div class="box">
-                   <div class="columns">
-                       <div class="column"><select id="selGuru" class="select is-fullwidth"><option value="">Pilih Guru</option></select></div>
-                       <div class="column is-narrow"><button class="button is-link" onclick="drawTable()">SEMAK</button></div>
-                   </div>
-                   <div id="resultsTable" class="mt-4"></div>
-                </div>
+        <div id="filterPanel" class="filter-box">
+            <div class="columns">
+                <div class="column is-8"><div class="select is-fullwidth"><select id="selGuru"><option value="">Memuatkan senarai guru...</option></select></div></div>
+                <div class="column is-4"><button class="button is-link is-fullwidth" onclick="drawTable()">SEMAK</button></div>
             </div>
-
-            <p class="footer-text">Sistem Inovasi Digital: D'SiRe @ 2026</p>
+            <div id="resultsTable" class="mt-4"></div>
         </div>
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbx3zn_eWaAKn7Cgljlje0WOvbmM0o0uNpkR5sHX-XesZzZP2B1B3kjgjTp1wo99jwFXEw/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxQCYfhi1mqkdIXpeynWeJ1d7Hj-DBs-_n2EHg0azbR3sos8H5HDH6UQhL3-9vgwJtozw/exec';
         const sheetID = '1T7GcIbxlqQiaBcjE7LaKAUzANhzzGtS--_xDyKXizCg';
 
         function loadFrame(url) {
@@ -125,23 +76,36 @@
             document.getElementById('filterPanel').style.display = 'block';
             fetch(scriptURL).then(r => r.json()).then(d => {
                 const el = document.getElementById('selGuru');
-                el.innerHTML = '<option value="">Pilih Guru...</option>';
+                el.innerHTML = '<option value="">Pilih Nama Guru...</option>';
                 [...new Set(d.guru)].forEach(i => { if(i) el.innerHTML += `<option value="${i}">${i}</option>`; });
             });
         }
-        
-        // Load Charts API
+
         google.charts.load('current', {'packages':['table']});
         function drawTable() {
             const guru = document.getElementById('selGuru').value;
-            let query = `SELECT B, C, D, E, F, Q, U WHERE B IS NOT NULL AND C = '${guru}'`;
-            const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(query)}&sheet=rekod_semakan`;
+            if(!guru) return alert("Pilih guru dahulu");
             
+            document.getElementById('resultsTable').innerHTML = "Menarik data...";
+            let query = encodeURIComponent(`SELECT B, C, D, E, F, Q, U WHERE C = '${guru}'`);
+            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${query}&sheet=rekod_semakan`;
+
             fetch(url).then(r => r.text()).then(txt => {
-                const json = JSON.parse(txt.substr(47).slice(0, -2));
-                const dt = new google.visualization.DataTable();
-                dt.addColumn('string', 'Tarikh'); dt.addColumn('string', 'Nama Guru'); dt.addColumn('string', 'Skala'); dt.addColumn('string', 'Link');
-                const rows = json.table.rows.map(r => [r.c[0].f, r.c[1].v, r.c[5].v, `<a href="${r.c[6].v}" target="_blank">PDF</a>`]);
+                let json = JSON.parse(txt.substr(47).slice(0, -2));
+                let dt = new google.visualization.DataTable();
+                dt.addColumn('string', 'Tarikh');
+                dt.addColumn('string', 'Tahun/Kelas');
+                dt.addColumn('string', 'Subjek');
+                dt.addColumn('string', 'Skala');
+                dt.addColumn('string', 'Pautan');
+
+                let rows = json.table.rows.map(r => [
+                    r.c[0] ? r.c[0].f : "",
+                    (r.c[2]?.v || "") + " " + (r.c[3]?.v || ""),
+                    r.c[4]?.v || "",
+                    r.c[5]?.v || "",
+                    r.c[6] ? `<a href="${r.c[6].v}" target="_blank" class="button is-small is-info">Buka PDF</a>` : "Tiada"
+                ]);
                 dt.addRows(rows);
                 new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml: true, width: '100%'});
             });
