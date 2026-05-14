@@ -73,16 +73,17 @@
         </div>
 
         <div class="nav-link is-active" onclick="location.reload()"><i class="fas fa-home"></i> Laman Utama</div>
-        <div class="nav-group-title">Menu Cepat</div>
+        
+        <div class="nav-group-title">Menu Utama</div>
         <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit"></i> Isi Laporan</div>
         <div class="nav-link" onclick="showSearchMenu()"><i class="fas fa-search"></i> Semak Rekod</div>
         <div class="nav-link" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')"><i class="fas fa-file-pdf"></i> Arkib PDF</div>
 
-        <div class="footer-credit">D'SiRe Innovation © 2026</div>
+        <div class="footer-credit">Office D'SiRe © 2026</div>
     </div>
 
     <div class="main-content" id="mainArea">
-        <div class="header-section">
+        <div class="header-section" id="headerSection">
             <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png">
             <h1>UNIT KURIKULUM</h1>
             <p>SK Simpang Rengam • Rekod Semakan Buku Murid</p>
@@ -138,12 +139,30 @@
         let currentFilterMode = '';
 
         function loadFrame(url) {
-            document.getElementById('mainArea').innerHTML = `<iframe src="${url}"></iframe>`;
+            // Sembunyikan semua menu apabila frame dimuatkan
+            document.getElementById('headerSection').style.display = 'none';
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('searchMenu').style.display = 'none';
+            document.getElementById('filterPanel').style.display = 'none';
+            
+            // Masukkan iframe ke dalam mainArea
+            const content = `<div style="width:100%;"><button class="button is-small is-light mb-2" onclick="location.reload()"><i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard</button><iframe src="${url}"></iframe></div>`;
+            document.getElementById('mainArea').innerHTML = content;
         }
 
         function showSearchMenu() {
+            // Pastikan header dipaparkan
+            document.getElementById('headerSection').style.display = 'block';
+            // Tukar paparan menu
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('searchMenu').style.display = 'flex';
+            document.getElementById('filterPanel').style.display = 'none';
+            
+            // Kembalikan struktur mainArea jika sebelum ini ia adalah iframe
+            const mainArea = document.getElementById('mainArea');
+            if (mainArea.querySelector('iframe')) {
+                location.reload(); // Cara paling selamat untuk reset dashboard jika dari iframe
+            }
         }
 
         function prepareFilter(mode) {
