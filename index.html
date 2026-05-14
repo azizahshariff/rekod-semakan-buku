@@ -34,7 +34,7 @@
     <div class="sidebar">
         <div class="brand" onclick="showHome()">
             <img src="logo_sksr.png" alt="Logo" style="width: 50px;" onerror="this.src='https://via.placeholder.com/50?text=SKSR'">
-            <p class="title is-6 mb-0 mt-2" style="color: var(--primary)">OFFICE D'SiRe</p>
+            <p class="title is-6 mb-0 mt-2" style="color: var(--primary)">Rekod Semakan Buku Murid</p>
             <p class="is-size-7 has-text-grey">SK SIMPANG RENGAM</p>
         </div>
 
@@ -44,19 +44,11 @@
 
         <p class="menu-label">Pengurusan Kurikulum</p>
         <a class="nav-link" id="nav-semak" onclick="loadIframe('halaman_semak_buku.html', this)">
-            <i class="fas fa-book-open mr-3"></i> e-Rekod Semakan Buku
+            <i class="fas fa-book-open mr-3"></i> Rekod Semakan Buku
         </a>
         <a class="nav-link" onclick="loadIframe('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list', this)">
             <i class="fas fa-folder-open mr-3"></i> Arkib PDF Semakan
         </a>
-
-        <p class="menu-label">Pengurusan HEM</p>
-        <a class="nav-link" id="nav-hem" onclick="loadIframe('https://laporangurubertugas.vercel.app/', this)">
-            <i class="fas fa-clipboard-check mr-3"></i> Laporan Guru Bertugas
-        </a>
-    </div>
-
-    <div class="content-area" id="mainView"></div>
 
     <script>
         function showHome() {
@@ -66,7 +58,7 @@
             display.innerHTML = `
                 <div class="home-container">
                     <img src="logo_sksr.png" class="school-logo" onerror="this.src='https://via.placeholder.com/100?text=LOGO'">
-                    <h1 class="home-title">SISTEM e-REKOD SEMAKAN BUKU MURID</h1>
+                    <h1 class="home-title">REKOD SEMAKAN BUKU MURID</h1>
                     <p class="home-subtitle">Pengurusan Kurikulum • SK Simpang Rengam</p>
                     <div class="home-grid">
                         <div class="menu-card" onclick="loadIframe('halaman_semak_buku.html', document.getElementById('nav-semak'))">
