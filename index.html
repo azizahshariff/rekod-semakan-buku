@@ -40,12 +40,12 @@
         .card-menu { display: flex; justify-content: center; gap: 20px; width: 100%; max-width: 900px; flex-wrap: wrap; }
         .menu-item { 
             background: white; border-radius: 20px; padding: 40px 20px; text-align: center; cursor: pointer; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 220px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 200px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid transparent;
         }
         .menu-item:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); border-color: #dbeafe; }
-        .menu-item i { font-size: 2.5rem; margin-bottom: 15px; display: block; }
-        .menu-item span { font-weight: 700; font-size: 0.85rem; color: #334155; text-transform: uppercase; }
+        .menu-item i { font-size: 2.2rem; margin-bottom: 15px; display: block; }
+        .menu-item span { font-weight: 700; font-size: 0.75rem; color: #334155; text-transform: uppercase; }
 
         /* SUB-MENU SEARCH STYLING */
         #searchMenu { display: none; }
@@ -61,6 +61,7 @@
         .icon-red { color: #ef4444; }
         .icon-orange { color: #f59e0b; }
         .icon-green { color: #10b981; }
+        .icon-purple { color: #7c3aed; }
     </style>
 </head>
 <body>
@@ -117,6 +118,10 @@
                 <i class="fas fa-calendar-day icon-orange"></i>
                 <span>TARIKH</span>
             </div>
+            <div class="menu-item" onclick="drawAdminRecord()">
+                <i class="fas fa-user-shield icon-purple"></i>
+                <span>REKOD PENTADBIR</span>
+            </div>
             <div style="width: 100%; text-align: center; margin-top: 20px;">
                 <button class="button is-text is-small" onclick="location.reload()"> Kembali ke Menu Utama</button>
             </div>
@@ -125,7 +130,7 @@
         <div id="filterPanel">
             <div class="columns is-vcentered">
                 <div class="column is-8" id="inputContainer"></div>
-                <div class="column is-4">
+                <div class="column is-4" id="searchBtnContainer">
                     <button class="button is-link is-fullwidth is-rounded" onclick="drawTable()">CARI DATA</button>
                 </div>
             </div>
@@ -139,35 +144,25 @@
         let currentFilterMode = '';
 
         function loadFrame(url) {
-            // Sembunyikan semua menu apabila frame dimuatkan
             document.getElementById('headerSection').style.display = 'none';
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('searchMenu').style.display = 'none';
             document.getElementById('filterPanel').style.display = 'none';
-            
-            // Masukkan iframe ke dalam mainArea
             const content = `<div style="width:100%;"><button class="button is-small is-light mb-2" onclick="location.reload()"><i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard</button><iframe src="${url}"></iframe></div>`;
             document.getElementById('mainArea').innerHTML = content;
         }
 
         function showSearchMenu() {
-            // Pastikan header dipaparkan
             document.getElementById('headerSection').style.display = 'block';
-            // Tukar paparan menu
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('searchMenu').style.display = 'flex';
             document.getElementById('filterPanel').style.display = 'none';
-            
-            // Kembalikan struktur mainArea jika sebelum ini ia adalah iframe
-            const mainArea = document.getElementById('mainArea');
-            if (mainArea.querySelector('iframe')) {
-                location.reload(); // Cara paling selamat untuk reset dashboard jika dari iframe
-            }
         }
 
         function prepareFilter(mode) {
             currentFilterMode = mode;
             document.getElementById('filterPanel').style.display = 'block';
+            document.getElementById('searchBtnContainer').style.display = 'block';
             const container = document.getElementById('inputContainer');
             container.innerHTML = '<p class="is-size-7">Memuatkan senarai...</p>';
 
@@ -187,6 +182,35 @@
         }
 
         google.charts.load('current', {'packages':['table']});
+
+        // FUNGSI BARU: PAPAR REKOD PENTADBIR
+        function drawAdminRecord() {
+            document.getElementById('filterPanel').style.display = 'block';
+            document.getElementById('inputContainer').innerHTML = '<h3 class="title is-6 has-text-primary">Ringkasan Laporan Pentadbir</h3>';
+            document.getElementById('searchBtnContainer').style.display = 'none';
+            document.getElementById('resultsTable').innerHTML = 'Menjana ringkasan data pentadbir...';
+
+            // Query untuk mendapatkan Lajur Pentadbir (H) dan Jawatan (I)
+            let query = `SELECT H, I, COUNT(B) GROUP BY H, I LABEL COUNT(B) 'Jumlah'`;
+            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(query)}&sheet=rekod_semakan`;
+
+            fetch(url).then(r => r.text()).then(txt => {
+                let json = JSON.parse(txt.substr(47).slice(0, -2));
+                let dt = new google.visualization.DataTable();
+                dt.addColumn('string', 'Nama Pentadbir');
+                dt.addColumn('string', 'Jawatan');
+                dt.addColumn('number', 'Jumlah Semakan');
+
+                let rows = json.table.rows.map(r => [
+                    r.c[0]?.v || "Tiada Nama",
+                    r.c[1]?.v || "-",
+                    r.c[2]?.v || 0
+                ]);
+
+                dt.addRows(rows);
+                new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml: true, width: '100%'});
+            });
+        }
 
         function drawTable() {
             const val = document.getElementById('filterValue').value;
