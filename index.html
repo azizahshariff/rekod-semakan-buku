@@ -16,11 +16,11 @@
         
         body { background-color: var(--bg-light); display: flex; height: 100vh; overflow: hidden; font-family: 'Segoe UI', Roboto, sans-serif; }
 
-        /* SIDEBAR STYLING - MENGIKUT GAMBAR */
+        /* SIDEBAR STYLING */
         .sidebar { width: var(--sidebar-width); background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; padding: 0; box-shadow: 2px 0 10px rgba(0,0,0,0.02); }
         .sidebar-header { text-align: center; padding: 30px 20px; }
         .sidebar-header img { width: 50px; margin-bottom: 10px; }
-        .sidebar-header .app-name { color: #2563eb; font-weight: 700; font-size: 0.9rem; line-height: 1.2; text-transform: none; }
+        .sidebar-header .app-name { color: #2563eb; font-weight: 700; font-size: 0.9rem; line-height: 1.2; }
         .sidebar-header .school-name { color: #64748b; font-size: 0.7rem; font-weight: 600; margin-top: 4px; }
 
         .nav-group-title { padding: 20px 25px 10px; font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
@@ -36,22 +36,21 @@
         .header-section h1 { color: #1e3a8a; font-size: 2.5rem; font-weight: 800; letter-spacing: -0.5px; }
         .header-section p { color: #64748b; font-size: 1.1rem; font-weight: 500; margin-top: 5px; }
 
-        /* CARD MENU - MENGIKUT GAMBAR */
-        .card-menu { display: flex; justify-content: center; gap: 20px; width: 100%; max-width: 1000px; flex-wrap: wrap; }
+        /* CARD MENU - 3 BUTANG UTAMA */
+        .card-menu { display: flex; justify-content: center; gap: 25px; width: 100%; max-width: 900px; flex-wrap: wrap; }
         .menu-item { 
-            background: white; border-radius: 20px; padding: 40px 20px; text-align: center; cursor: pointer; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 220px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            background: white; border-radius: 20px; padding: 45px 25px; text-align: center; cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); width: 240px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
             border: 1px solid transparent;
         }
         .menu-item:hover { transform: translateY(-8px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border-color: #dbeafe; }
-        .menu-item i { font-size: 2.2rem; margin-bottom: 20px; display: block; }
-        .menu-item span { font-weight: 700; font-size: 0.85rem; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; }
+        .menu-item i { font-size: 2.5rem; margin-bottom: 20px; display: block; }
+        .menu-item span { font-weight: 700; font-size: 0.9rem; color: #334155; text-transform: uppercase; }
 
-        /* WARNA IKON MENGIKUT TEMA GAMBAR */
-        .icon-isi { color: #1e40af; } /* Biru Gelap */
-        .icon-status { color: #ef4444; } /* Merah */
-        .icon-jadual { color: #6366f1; } /* Indigo */
+        /* WARNA IKON */
+        .icon-isi { color: #1e40af; } /* Biru */
+        .icon-semak { color: #ef4444; } /* Merah */
         .icon-arkib { color: #f59e0b; } /* Amber */
 
         /* SEARCH INTERFACE */
@@ -61,7 +60,7 @@
             align-items: center; justify-content: center; border-radius: 16px; cursor: pointer; 
             transition: 0.2s; border: 1px solid #f1f5f9; background: #f8fafc;
         }
-        .btn-option:hover { background: #1e3a8a; color: white !important; transform: scale(1.05); }
+        .btn-option:hover { background: #1e3a8a; color: white !important; }
         .btn-option i { font-size: 1.6rem; margin-bottom: 10px; }
         .btn-option span { font-weight: 700; font-size: 0.75rem; }
 
@@ -69,7 +68,7 @@
         
         .footer-credit { margin-top: auto; padding: 20px; text-align: center; color: #cbd5e1; font-size: 0.65rem; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        iframe { width: 100%; height: 85vh; border: none; border-radius: 15px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        iframe { width: 100%; height: 85vh; border: none; border-radius: 15px; }
     </style>
 </head>
 <body>
@@ -83,18 +82,12 @@
 
         <div class="nav-link is-active" onclick="location.reload()"><i class="fas fa-home"></i> Laman Utama</div>
 
-        <div class="nav-group-title">Pengurusan</div>
+        <div class="nav-group-title">Menu Utama</div>
         <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit"></i> Isi Laporan</div>
+        <div class="nav-link" onclick="showSearchOptions()"><i class="fas fa-search"></i> Semakan Rekod</div>
+        <div class="nav-link" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')"><i class="fas fa-file-pdf"></i> Arkib PDF</div>
 
-        <div class="nav-group-title">Semakan Status</div>
-        <div class="nav-link" onclick="showSearchOptions()"><i class="fas fa-exclamation-triangle"></i> Status Harian</div>
-        <div class="nav-link" onclick="showSearchOptions()"><i class="fas fa-bullhorn"></i> Status Perhimpunan</div>
-
-        <div class="nav-group-title">Jadual</div>
-        <div class="nav-link" onclick="loadFrame('https://docs.google.com/spreadsheets/d/1T7GcIbxlqQiaBcjE7LaKAUzANhzzGtS--_xDyKXizCg/edit')"><i class="fas fa-calendar-alt"></i> Jadual Bertugas</div>
-        <div class="nav-link" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')"><i class="fas fa-folder"></i> Laporan PDF</div>
-
-        <div class="footer-credit">Sistem Inovasi Digital: D'SiRe © 2026</div>
+        <div class="footer-credit">Office D'SiRe © 2026</div>
     </div>
 
     <div class="main-content" id="mainArea">
@@ -110,12 +103,8 @@
                 <span>ISI LAPORAN</span>
             </div>
             <div class="menu-item" onclick="showSearchOptions()">
-                <i class="fas fa-list-ul icon-status"></i>
-                <span>STATUS HARIAN</span>
-            </div>
-            <div class="menu-item" onclick="window.open('https://docs.google.com/spreadsheets/d/1T7GcIbxlqQiaBcjE7LaKAUzANhzzGtS--_xDyKXizCg/edit', '_blank')">
-                <i class="fas fa-calendar-check icon-jadual"></i>
-                <span>JADUAL BERTUGAS</span>
+                <i class="fas fa-search-plus icon-semak"></i>
+                <span>SEMAKAN</span>
             </div>
             <div class="menu-item" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')">
                 <i class="fas fa-file-pdf icon-arkib"></i>
@@ -124,7 +113,7 @@
         </div>
 
         <div id="searchOptions">
-            <h2 class="title is-4 mb-5" style="color: #1e3a8a;">Kategori Carian Rekod</h2>
+            <h2 class="title is-4 mb-5" style="color: #1e3a8a;">Sila Pilih Kategori Semakan</h2>
             <div class="btn-option has-text-link" onclick="prepareFilter('GURU')">
                 <i class="fas fa-user-tie"></i>
                 <span>Nama Guru</span>
@@ -139,7 +128,7 @@
             </div>
             <div class="mt-5">
                 <button class="button is-light is-rounded" onclick="resetView()">
-                    <i class="fas fa-arrow-left mr-2"></i> Kembali ke Menu Utama
+                    <i class="fas fa-arrow-left mr-2"></i> Kembali
                 </button>
             </div>
         </div>
@@ -186,14 +175,14 @@
             fetch(scriptURL).then(r => r.json()).then(d => {
                 if (mode === 'GURU') {
                     let opts = d.guru.map(g => `<option value="${g}">${g}</option>`).join('');
-                    container.innerHTML = `<label class="label is-small">Nama Guru</label><div class="select is-fullwidth is-link"><select id="filterValue"><option value="">-- Pilih Nama --</option>${opts}</select></div>`;
+                    container.innerHTML = `<label class="label is-small">Pilih Nama Guru</label><div class="select is-fullwidth is-link"><select id="filterValue"><option value="">-- Senarai Guru --</option>${opts}</select></div>`;
                 } 
                 else if (mode === 'SUBJEK') {
                     let opts = d.subjek.map(s => `<option value="${s}">${s}</option>`).join('');
-                    container.innerHTML = `<label class="label is-small">Mata Pelajaran</label><div class="select is-fullwidth is-link"><select id="filterValue"><option value="">-- Pilih Subjek --</option>${opts}</select></div>`;
+                    container.innerHTML = `<label class="label is-small">Pilih Mata Pelajaran</label><div class="select is-fullwidth is-link"><select id="filterValue"><option value="">-- Senarai Subjek --</option>${opts}</select></div>`;
                 }
                 else if (mode === 'TARIKH') {
-                    container.innerHTML = `<label class="label is-small">Tarikh Semakan</label><input type="date" id="filterValue" class="input is-link">`;
+                    container.innerHTML = `<label class="label is-small">Pilih Tarikh</label><input type="date" id="filterValue" class="input is-link">`;
                 }
             });
         }
@@ -204,7 +193,7 @@
             const val = document.getElementById('filterValue').value;
             if(!val) return;
             
-            document.getElementById('resultsTable').innerHTML = '<p class="has-text-centered py-5">Memproses data...</p>';
+            document.getElementById('resultsTable').innerHTML = '<p class="has-text-centered py-5">Memuatkan rekod...</p>';
             
             let query = "";
             if(currentFilterMode === 'GURU') query = `SELECT B, C, D, E, F, Q, U WHERE C = '${val}'`;
@@ -224,7 +213,7 @@
                 dt.addColumn('string', 'Kelas');
                 dt.addColumn('string', 'Subjek');
                 dt.addColumn('string', 'Skala');
-                dt.addColumn('string', 'Arkib');
+                dt.addColumn('string', 'PDF');
 
                 let rows = json.table.rows.map(r => [
                     r.c[0] ? r.c[0].f : "",
@@ -232,7 +221,7 @@
                     (r.c[2]?.v || "") + " " + (r.c[3]?.v || ""),
                     r.c[4]?.v || "",
                     r.c[5]?.v || "",
-                    r.c[6] ? `<a href="${r.c[6].v}" target="_blank" class="button is-small is-link is-rounded">BUKA PDF</a>` : "Tiada"
+                    r.c[6] ? `<a href="${r.c[6].v}" target="_blank" class="button is-small is-link is-outlined">LIHAT</a>` : "Tiada"
                 ]);
 
                 dt.addRows(rows);
