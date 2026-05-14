@@ -142,14 +142,14 @@
         function drawAdminRecord() {
             document.getElementById('filterPanel').style.display = 'block';
             document.getElementById('btnSearchArea').style.display = 'none';
-            document.getElementById('inputContainer').innerHTML = '<strong>Ringkasan Aktiviti Pentadbir (Mengikut Tarikh & Guru)</strong>';
+            document.getElementById('inputContainer').innerHTML = '<strong>Ringkasan Aktiviti Pentadbir (Rekod & PDF)</strong>';
             
-            // Pastikan B adalah lajur tarikh dalam Google Sheet tuan
-            let q = encodeURIComponent(`SELECT S, T, B, C, F ORDER BY B DESC LABEL S 'Penyemak', T 'Jawatan', B 'Tarikh', C 'Guru Disemak', F 'Mata Pelajaran'`);
+            // Query dikemaskini untuk mengambil:
+            // S (Pentadbir), T (Jawatan), B (Tarikh), C (Guru), F (Subjek), U (Link PDF)
+            let q = encodeURIComponent(`SELECT S, T, B, C, F, U ORDER BY B DESC LABEL S 'Penyemak', T 'Jawatan', B 'Tarikh', C 'Guru Disemak', F 'Mata Pelajaran', U 'Laporan'`);
             let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
 
             fetch(url).then(r => r.text()).then(t => {
-                // Buang header JSON Google
                 let j = JSON.parse(t.substr(47).slice(0,-2));
                 let dt = new google.visualization.DataTable();
                 
@@ -158,21 +158,24 @@
                 dt.addColumn('string', 'Tarikh'); 
                 dt.addColumn('string', 'Guru Disemak'); 
                 dt.addColumn('string', 'Mata Pelajaran'); 
+                dt.addColumn('string', 'Laporan'); // Lajur baru untuk PDF
 
                 let rows = j.table.rows.map(r => {
-                    // Logik untuk pastikan tarikh dipaparkan
                     let tarikhVal = "";
                     if (r.c[2]) {
-                        // Gunakan .f (format) jika ada, jika tiada guna .v (value)
                         tarikhVal = r.c[2].f ? r.c[2].f : r.c[2].v;
                     }
+
+                    // Ambil link PDF dari lajur U (index 5 dalam query)
+                    let pdfLink = r.c[5] ? `<a href="${r.c[5].v}" target="_blank" class="button is-small is-danger is-outlined"><i class="fas fa-file-pdf mr-1"></i> PDF</a>` : "<span class='has-text-grey-light'>Tiada</span>";
 
                     return [
                         r.c[0] ? r.c[0].v : "", 
                         r.c[1] ? r.c[1].v : "", 
                         tarikhVal, 
                         r.c[3] ? r.c[3].v : "", 
-                        r.c[4] ? r.c[4].v : ""
+                        r.c[4] ? r.c[4].v : "",
+                        pdfLink
                     ];
                 });
 
@@ -181,7 +184,7 @@
                     width: '100%', 
                     pageSize: 15,
                     alternatingRowStyle: true,
-                    allowHtml: true
+                    allowHtml: true // MESTI TRUE untuk paparkan butang PDF
                 });
             });
         }
