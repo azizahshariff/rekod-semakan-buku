@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D'SiRe Dashboard SK Simpang Rengam</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #1e3a8a; --danger: #ef4444; --bg-body: #f1f5f9;
+        }
+        body { background: var(--bg-body); height: 100vh; overflow: hidden; display: flex; margin: 0; font-family: 'Inter', sans-serif; }
+        .sidebar { background: white; width: 280px; border-right: 1px solid #e2e8f0; padding: 30px 20px; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.02); }
+        .brand { text-align: center; margin-bottom: 30px; cursor: pointer; }
+        .nav-link { display: flex; align-items: center; padding: 12px 18px; color: #64748b; border-radius: 12px; margin-bottom: 5px; text-decoration: none; cursor: pointer; transition: 0.3s; font-weight: 500; font-size: 0.9rem; }
+        .nav-link:hover { background: #f8fafc; color: var(--primary); transform: translateX(5px); }
+        .is-active { background: #eff6ff; color: var(--primary); font-weight: 700; border-left: 4px solid var(--primary); }
+        .menu-label { margin-top: 15px; font-weight: 800; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.2px; }
+        .content-area { flex-grow: 1; background: var(--bg-body); position: relative; overflow-y: auto; }
+        iframe { width: 100%; height: 100%; border: none; }
+        .home-container { padding: 40px; max-width: 1000px; margin: 0 auto; text-align: center; }
+        .school-logo { width: 100px; margin-bottom: 15px; }
+        .home-title { color: var(--primary); font-weight: 800; font-size: 2.2rem; margin-bottom: 5px; }
+        .home-subtitle { color: #64748b; font-size: 1.1rem; font-weight: 500; margin-bottom: 30px; }
+        .home-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .menu-card { background: white; padding: 25px; border-radius: 20px; transition: 0.3s; cursor: pointer; border: 1px solid #f1f5f9; }
+        .menu-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 15px 20px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="brand" onclick="showHome()">
+            <img src="logo_sksr.png" alt="Logo" style="width: 50px;" onerror="this.src='https://via.placeholder.com/50?text=SKSR'">
+            <p class="title is-6 mb-0 mt-2" style="color: var(--primary)">OFFICE D'SiRe</p>
+            <p class="is-size-7 has-text-grey">SK SIMPANG RENGAM</p>
+        </div>
+
+        <a class="nav-link is-active" id="nav-home" onclick="showHome()">
+            <i class="fas fa-home mr-3"></i> Laman Utama
+        </a>
+
+        <p class="menu-label">Pengurusan Kurikulum</p>
+        <a class="nav-link" id="nav-semak" onclick="loadIframe('halaman_semak_buku.html', this)">
+            <i class="fas fa-book-open mr-3"></i> e-Rekod Semakan Buku
+        </a>
+        <a class="nav-link" onclick="loadIframe('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list', this)">
+            <i class="fas fa-folder-open mr-3"></i> Arkib PDF Semakan
+        </a>
+
+        <p class="menu-label">Pengurusan HEM</p>
+        <a class="nav-link" id="nav-hem" onclick="loadIframe('https://laporangurubertugas.vercel.app/', this)">
+            <i class="fas fa-clipboard-check mr-3"></i> Laporan Guru Bertugas
+        </a>
+    </div>
+
+    <div class="content-area" id="mainView"></div>
+
+    <script>
+        function showHome() {
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('is-active'));
+            document.getElementById('nav-home').classList.add('is-active');
+            const display = document.getElementById('mainView');
+            display.innerHTML = `
+                <div class="home-container">
+                    <img src="logo_sksr.png" class="school-logo" onerror="this.src='https://via.placeholder.com/100?text=LOGO'">
+                    <h1 class="home-title">SISTEM e-REKOD SEMAKAN BUKU MURID</h1>
+                    <p class="home-subtitle">Pengurusan Kurikulum • SK Simpang Rengam</p>
+                    <div class="home-grid">
+                        <div class="menu-card" onclick="loadIframe('halaman_semak_buku.html', document.getElementById('nav-semak'))">
+                            <i class="fas fa-book fa-2x mb-2" style="color: #6366f1"></i><br>
+                            <span class="has-text-weight-bold">ISI REKOD SEMAKAN</span>
+                        </div>
+                        <div class="menu-card" onclick="loadIframe('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list', null)">
+                            <i class="fas fa-file-pdf fa-2x mb-2" style="color: var(--danger)"></i><br>
+                            <span class="has-text-weight-bold">ARKIB SEMAKAN</span>
+                        </div>
+                    </div>
+                    <p class="mt-6 is-size-7 has-text-grey">Sistem Inovasi Digital : D'SiRe @2026</p>
+                </div>
+            `;
+        }
+
+        function loadIframe(url, element) {
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('is-active'));
+            if(element) element.classList.add('is-active');
+            document.getElementById('mainView').innerHTML = `<iframe src="${url}"></iframe>`;
+        }
+        window.onload = showHome;
+    </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>e-Rekod Semakan Buku</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #1e3a8a; --bg: #f8fafc; }
+        body { background: var(--bg); padding: 20px; font-family: 'Inter', sans-serif; }
+        .form-container { background: white; max-width: 650px; margin: 0 auto; padding: 35px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--primary); }
+        .btn-submit { background: var(--primary); color: white; width: 100%; border-radius: 12px; font-weight: 700; height: 50px; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="has-text-centered mb-5">
+            <img src="logo_sksr.png" style="width: 70px;" onerror="this.src='https://via.placeholder.com/70?text=LOGO'">
+            <h1 class="title is-4 mb-1">REKOD SEMAKAN BUKU MURID</h1>
+            <p class="subtitle is-7 has-text-grey">PENGURUSAN KURIKULUM • SK SIMPANG RENGAM</p>
+        </div>
+
+        <form id="semakForm">
+            <div class="field">
+                <label class="label">Nama Guru</label>
+                <input class="input" type="text" id="namaGuru" placeholder="Nama Penuh Guru" required>
+            </div>
+            <div class="columns">
+                <div class="column"><label class="label">Mata Pelajaran</label><input class="input" type="text" id="subjek" required></div>
+                <div class="column"><label class="label">Kelas</label><input class="input" type="text" id="kelas" required></div>
+            </div>
+            <div class="columns">
+                <div class="column"><label class="label">Bil. Murid</label><input class="input" type="number" id="bilMurid" required></div>
+                <div class="column"><label class="label">Bil. Buku Dihantar</label><input class="input" type="number" id="bilBuku" required></div>
+            </div>
+            <div class="field">
+                <label class="label">Ulasan Semakan</label>
+                <textarea class="textarea" id="ulasan" rows="2"></textarea>
+            </div>
+            <button type="submit" id="submitBtn" class="button btn-submit mt-4">HANTAR & JANA PDF</button>
+        </form>
+        <p class="has-text-centered is-size-7 mt-5 has-text-grey-light">Sistem Inovasi Digital : D'SiRe @2026</p>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxzNeUitXdx7CpEZKb9QFBqXY6XRb_AtNRYI9U0sk98OdV4ORlpJ8kfcNezuXIf9Z63KQ/exec';
+        const form = document.getElementById('semakForm');
+        const btn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            btn.innerHTML = "Memproses...";
+            btn.disabled = true;
+
+            const data = {
+                namaGuru: document.getElementById('namaGuru').value,
+                subjek: document.getElementById('subjek').value,
+                kelas: document.getElementById('kelas').value,
+                bilMurid: document.getElementById('bilMurid').value,
+                bilBuku: document.getElementById('bilBuku').value,
+                ulasan: document.getElementById('ulasan').value
+            };
+
+            fetch(scriptURL, { method: 'POST', body: JSON.stringify(data)})
+            .then(() => {
+                alert("Rekod Berjaya Dihantar!");
+                form.reset();
+                btn.innerHTML = "HANTAR & JANA PDF";
+                btn.disabled = false;
+            })
+            .catch(() => {
+                alert("Ralat penghantaran.");
+                btn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
