@@ -8,22 +8,37 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
-        :root { --sidebar-bg: #f8f9fa; --active-color: #1e3a8a; }
+        :root { --sidebar-bg: #f8f9fa; --active-color: #1e3a8a; --accent: #3273dc; }
         body { background-color: #ffffff; display: flex; height: 100vh; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+        
         .sidebar { width: 250px; background: var(--sidebar-bg); border-right: 1px solid #e9ecef; display: flex; flex-direction: column; padding: 20px 0; }
         .sidebar-header { text-align: center; padding: 0 20px 30px; border-bottom: 1px solid #dee2e6; margin-bottom: 20px; }
         .sidebar-header img { width: 60px; }
-        .nav-link { padding: 12px 25px; display: flex; align-items: center; color: #495057; cursor: pointer; font-size: 0.9rem; }
-        .nav-link:hover, .nav-link.is-active { background: #e9ecef; color: var(--active-color); font-weight: 600; }
-        .main-content { flex-grow: 1; overflow-y: auto; padding: 40px; }
+        
+        .nav-link { padding: 12px 25px; display: flex; align-items: center; color: #495057; cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
+        .nav-link:hover, .nav-link.is-active { background: #e9ecef; color: var(--active-color); font-weight: 600; border-left: 4px solid var(--active-color); }
+
+        .main-content { flex-grow: 1; overflow-y: auto; padding: 40px; background: #fdfdfd; }
         .header-section { text-align: center; margin-bottom: 40px; }
         .header-section h1 { color: #1e3a8a; font-size: 2.2rem; font-weight: 800; }
-        .card-menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
-        .menu-item { border: 1px solid #dee2e6; border-radius: 12px; padding: 25px 10px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .menu-item:hover { transform: translateY(-3px); border-color: var(--active-color); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .menu-item i { font-size: 2rem; margin-bottom: 10px; display: block; }
-        .menu-item span { font-weight: bold; font-size: 0.75rem; color: #343a40; }
-        .filter-box { background: #f1f5f9; padding: 20px; border-radius: 12px; display: none; }
+
+        /* Menu Utama */
+        .card-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .menu-item { background: white; border: 1px solid #dee2e6; border-radius: 15px; padding: 30px 15px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .menu-item:hover { transform: translateY(-5px); border-color: var(--active-color); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .menu-item i { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+        .menu-item span { font-weight: bold; font-size: 0.8rem; color: #343a40; }
+
+        /* Sub-Menu Pilihan Carian */
+        #searchOptions { display: none; background: #ffffff; padding: 30px; border-radius: 20px; border: 2px dashed #dbdbdb; text-align: center; margin-top: 20px; animation: fadeIn 0.5s; }
+        .btn-option { margin: 10px; width: 180px; height: 100px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; transition: 0.2s; border: 1px solid #eee; }
+        .btn-option:hover { background: var(--active-color); color: white; }
+        .btn-option i { font-size: 1.5rem; margin-bottom: 8px; }
+
+        /* Panel Input Filter */
+        #filterPanel { display: none; background: #f1f5f9; padding: 25px; border-radius: 15px; margin-top: 20px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         iframe { width: 100%; height: 85vh; border: none; border-radius: 12px; }
     </style>
 </head>
@@ -32,33 +47,61 @@
     <div class="sidebar">
         <div class="sidebar-header">
             <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" alt="Logo">
-            <p class="title is-6 mb-0" style="color: var(--primary)">Rekod Semakan Buku Murid</p>
+            <p class="title is-6 mb-0" style="color: var(--primary)">Laporan Guru Bertugas</p>
             <p class="is-size-7 has-text-weight-bold mt-2">SK SIMPANG RENGAM</p>
         </div>
         <div class="nav-link is-active" onclick="location.reload()"><i class="fas fa-home mr-2"></i> Laman Utama</div>
         <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit mr-2"></i> Isi Laporan</div>
-        <div class="nav-link" onclick="toggleFilter()"><i class="fas fa-chart-bar mr-2"></i> Status Semakan</div>
         <div class="nav-link" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')"><i class="fas fa-file-pdf mr-2"></i> Arkib PDF</div>
     </div>
 
     <div class="main-content" id="mainArea">
         <div class="header-section">
             <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" style="width:70px;">
-            <h1>REKOD SEMAKAN BUKU MURID</h1>
-            <p class="has-text-grey">SK Simpang Rengam • Unit Kurikulum</p>
+            <h1>SISTEM PENGURUSAN SEMAKAN BUKU</h1>
+            <p class="has-text-grey">SK Simpang Rengam • Inovasi D'SiRe @2026</p>
         </div>
 
-        <div class="card-menu">
-            <div class="menu-item" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit has-text-link"></i><span>ISI LAPORAN</span></div>
-            <div class="menu-item" onclick="toggleFilter()"><i class="fas fa-list-check has-text-danger"></i><span>STATUS SEMAKAN</span></div>
-            <div class="menu-item" onclick="window.open('https://docs.google.com/spreadsheets/d/1T7GcIbxlqQiaBcjE7LaKAUzANhzzGtS--_xDyKXizCg/edit', '_blank')"><i class="fas fa-table has-text-success"></i><span>DATA SHEET</span></div>
-            <div class="menu-item" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')"><i class="fas fa-file-pdf has-text-info"></i><span>ARKIB PDF</span></div>
+        <div class="card-menu" id="primaryMenu">
+            <div class="menu-item" onclick="loadFrame('halaman_semak_buku.html')">
+                <i class="fas fa-plus-circle has-text-danger"></i>
+                <span>ISI REKOD BARU</span>
+            </div>
+            <div class="menu-item" onclick="showSearchOptions()">
+                <i class="fas fa-search has-text-link"></i>
+                <span>STATUS SEMAKAN</span>
+            </div>
+            <div class="menu-item" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')">
+                <i class="fas fa-folder-open has-text-warning"></i>
+                <span>ARKIB PDF</span>
+            </div>
         </div>
 
-        <div id="filterPanel" class="filter-box">
-            <div class="columns">
-                <div class="column is-8"><div class="select is-fullwidth"><select id="selGuru"><option value="">Memuatkan senarai guru...</option></select></div></div>
-                <div class="column is-4"><button class="button is-link is-fullwidth" onclick="drawTable()">SEMAK</button></div>
+        <div id="searchOptions">
+            <h2 class="title is-5">Sila Pilih Kategori Carian:</h2>
+            <div class="btn-option has-text-link" onclick="prepareFilter('GURU')">
+                <i class="fas fa-user-tie"></i>
+                <span>Nama Guru</span>
+            </div>
+            <div class="btn-option has-text-success" onclick="prepareFilter('SUBJEK')">
+                <i class="fas fa-book"></i>
+                <span>Mata Pelajaran</span>
+            </div>
+            <div class="btn-option has-text-warning" onclick="prepareFilter('TARIKH')">
+                <i class="fas fa-calendar-day"></i>
+                <span>Tarikh</span>
+            </div>
+            <div class="mt-4">
+                <button class="button is-small is-text" onclick="resetView()">Kembali ke Menu Utama</button>
+            </div>
+        </div>
+
+        <div id="filterPanel">
+            <div class="columns is-vcentered">
+                <div class="column is-8" id="inputContainer"></div>
+                <div class="column is-4">
+                    <button class="button is-link is-fullwidth" onclick="drawTable()">CARI SEKARANG</button>
+                </div>
             </div>
             <div id="resultsTable" class="mt-4"></div>
         </div>
@@ -67,47 +110,83 @@
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbxQCYfhi1mqkdIXpeynWeJ1d7Hj-DBs-_n2EHg0azbR3sos8H5HDH6UQhL3-9vgwJtozw/exec';
         const sheetID = '1T7GcIbxlqQiaBcjE7LaKAUzANhzzGtS--_xDyKXizCg';
+        let currentFilterMode = '';
 
         function loadFrame(url) {
             document.getElementById('mainArea').innerHTML = `<iframe src="${url}"></iframe>`;
         }
 
-        function toggleFilter() {
+        function showSearchOptions() {
+            document.getElementById('primaryMenu').style.display = 'none';
+            document.getElementById('searchOptions').style.display = 'block';
+        }
+
+        function resetView() {
+            document.getElementById('primaryMenu').style.display = 'grid';
+            document.getElementById('searchOptions').style.display = 'none';
+            document.getElementById('filterPanel').style.display = 'none';
+        }
+
+        function prepareFilter(mode) {
+            currentFilterMode = mode;
             document.getElementById('filterPanel').style.display = 'block';
+            const container = document.getElementById('inputContainer');
+            container.innerHTML = '<p class="is-size-7">Sedang memuatkan data dari sistem...</p>';
+
             fetch(scriptURL).then(r => r.json()).then(d => {
-                const el = document.getElementById('selGuru');
-                el.innerHTML = '<option value="">Pilih Nama Guru...</option>';
-                [...new Set(d.guru)].forEach(i => { if(i) el.innerHTML += `<option value="${i}">${i}</option>`; });
+                if (mode === 'GURU') {
+                    let opts = d.guru.map(g => `<option value="${g}">${g}</option>`).join('');
+                    container.innerHTML = `<label class="label is-small">Pilih Nama Guru:</label><div class="select is-fullwidth"><select id="filterValue"><option value="">-- Pilih Guru --</option>${opts}</select></div>`;
+                } 
+                else if (mode === 'SUBJEK') {
+                    let opts = d.subjek.map(s => `<option value="${s}">${s}</option>`).join('');
+                    container.innerHTML = `<label class="label is-small">Pilih Mata Pelajaran:</label><div class="select is-fullwidth"><select id="filterValue"><option value="">-- Pilih Subjek --</option>${opts}</select></div>`;
+                }
+                else if (mode === 'TARIKH') {
+                    container.innerHTML = `<label class="label is-small">Pilih Tarikh:</label><input type="date" id="filterValue" class="input">`;
+                }
             });
         }
 
         google.charts.load('current', {'packages':['table']});
+
         function drawTable() {
-            const guru = document.getElementById('selGuru').value;
-            if(!guru) return alert("Pilih guru dahulu");
+            const val = document.getElementById('filterValue').value;
+            if(!val) return alert("Sila masukkan maklumat carian");
             
-            document.getElementById('resultsTable').innerHTML = "Menarik data...";
-            let query = encodeURIComponent(`SELECT B, C, D, E, F, Q, U WHERE C = '${guru}'`);
-            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${query}&sheet=rekod_semakan`;
+            document.getElementById('resultsTable').innerHTML = "Menyusun data...";
+            
+            let query = "";
+            if(currentFilterMode === 'GURU') query = `SELECT B, C, D, E, F, Q, U WHERE C = '${val}'`;
+            if(currentFilterMode === 'SUBJEK') query = `SELECT B, C, D, E, F, Q, U WHERE F = '${val}'`;
+            if(currentFilterMode === 'TARIKH') {
+                let d = val.split('-');
+                query = `SELECT B, C, D, E, F, Q, U WHERE B = '${d[2]}/${d[1]}/${d[0]}'`;
+            }
+
+            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(query)}&sheet=rekod_semakan`;
 
             fetch(url).then(r => r.text()).then(txt => {
                 let json = JSON.parse(txt.substr(47).slice(0, -2));
                 let dt = new google.visualization.DataTable();
                 dt.addColumn('string', 'Tarikh');
-                dt.addColumn('string', 'Tahun/Kelas');
+                dt.addColumn('string', 'Nama Guru');
+                dt.addColumn('string', 'Kelas');
                 dt.addColumn('string', 'Subjek');
                 dt.addColumn('string', 'Skala');
-                dt.addColumn('string', 'Pautan');
+                dt.addColumn('string', 'Tindakan');
 
                 let rows = json.table.rows.map(r => [
                     r.c[0] ? r.c[0].f : "",
+                    r.c[1]?.v || "",
                     (r.c[2]?.v || "") + " " + (r.c[3]?.v || ""),
                     r.c[4]?.v || "",
                     r.c[5]?.v || "",
-                    r.c[6] ? `<a href="${r.c[6].v}" target="_blank" class="button is-small is-info">Buka PDF</a>` : "Tiada"
+                    r.c[6] ? `<a href="${r.c[6].v}" target="_blank" class="button is-small is-link is-outlined">LIHAT PDF</a>` : "Tiada"
                 ]);
+
                 dt.addRows(rows);
-                new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml: true, width: '100%'});
+                new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml: true, width: '100%', pageSize: 5});
             });
         }
     </script>
