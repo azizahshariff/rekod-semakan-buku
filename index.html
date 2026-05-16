@@ -10,31 +10,53 @@
     <style>
         :root { --primary: #1e3a8a; --bg: #f4f7fa; --sidebar: 260px; }
         body { background-color: var(--bg); display: flex; height: 100vh; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+        
         .sidebar { width: var(--sidebar); background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
         .sidebar-header { text-align: center; padding: 30px 20px; }
         .sidebar-header img { width: 55px; }
+        
         .nav-link { padding: 12px 25px; display: flex; align-items: center; color: #64748b; cursor: pointer; font-size: 0.85rem; transition: 0.2s; border-radius: 8px; margin: 2px 15px; }
         .nav-link:hover { background: #f1f5f9; color: var(--primary); }
         .nav-link.is-active { background: #eff6ff; color: #1e40af; font-weight: 700; }
         .nav-group-title { padding: 15px 25px 5px; font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
+
         .main-content { flex-grow: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
-        iframe { width: 100%; height: 85vh; border: none; border-radius: 15px; }
-        #loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.85); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; display: none; }
-        .spinner { border: 5px solid #f3f3f3; border-top: 5px solid var(--primary); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .header-section { text-align: center; margin-bottom: 30px; }
+        
         .card-menu { display: flex; justify-content: center; gap: 20px; width: 100%; max-width: 900px; flex-wrap: wrap; }
         .menu-item { background: white; border-radius: 18px; padding: 40px 20px; text-align: center; cursor: pointer; transition: 0.3s; width: 220px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .menu-item:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
         .menu-item i { font-size: 2.5rem; margin-bottom: 15px; display: block; }
         .menu-item span { font-weight: 700; font-size: 0.85rem; color: #334155; text-transform: uppercase; }
+
+        #searchMenu { display: none; }
+        #filterPanel { display: none; background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 800px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        iframe { width: 100%; height: 85vh; border: none; border-radius: 15px; }
+        
         .icon-isi { color: #1e40af; } .icon-semak { color: #ef4444; } .icon-arkib { color: #f59e0b; }
+
+        .stats-container { width: 100%; max-width: 900px; margin-bottom: 20px; }
+        .chart-box { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 260px; }
+
+        #loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999; display: none;
+        }
+        .spinner {
+            border: 5px solid #f3f3f3; border-top: 5px solid var(--primary);
+            border-radius: 50%; width: 50px; height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <div id="loader-overlay">
         <div class="spinner"></div>
-        <p class="mt-4 has-text-weight-bold" style="color: var(--primary); letter-spacing: 1px;">SILA TUNGGU...</p>
+        <p class="mt-4 has-text-weight-bold" style="color: var(--primary); letter-spacing: 1px;">MEMPROSES DATA SKSR...</p>
     </div>
 
     <div class="sidebar">
@@ -43,143 +65,242 @@
             <p style="font-weight: 700; color: var(--primary); font-size: 0.85rem; margin-top: 10px;">REKOD SEMAKAN BUKU MURID</p>
             <p class="subtitle is-6 has-text-grey">SK Simpang Rengam</p>
         </div>
-        <div class="nav-link" onclick="location.reload()"><i class="fas fa-home mr-3"></i> Laman Utama</div>
+        <div class="nav-link is-active" onclick="location.reload()"><i class="fas fa-home mr-3"></i> Laman Utama</div>
+        
         <div class="nav-group-title">Menu Utama</div>
         <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit mr-3"></i> Isi Laporan</div>
-        <div class="nav-link" onclick="openPdfSearch()"><i class="fas fa-file-search mr-3"></i> Carian Fail PDF</div>
+        <div class="nav-link" onclick="showSearchMenu()"><i class="fas fa-search mr-3"></i> Semak Rekod</div>
+        <div class="nav-link" onclick="openPdfSearch()"><i class="fas fa-file-search mr-3"></i> Fail PDF</div>
     </div>
 
     <div class="main-content" id="mainArea">
-        <div id="headerSection" class="has-text-centered mb-6">
+        <div id="headerSection" class="header-section">
             <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" width="70">
-            <h1 class="title is-3" style="color: var(--primary); margin-top: 10px;">SISTEM PENGURUSAN KURIKULUM</h1>
-            <p class="subtitle is-6 has-text-grey">SK Simpang Rengam</p>
+            <h1 class="title is-3" style="color: var(--primary); margin-top: 10px;">PENGURUSAN UNIT KURIKULUM</h1>
+            <p class="subtitle is-6 has-text-grey">SK Simpang Rengam • Rekod Semakan Buku Murid</p>
+        </div>
+
+        <div id="statsSection" class="stats-container">
+            <div class="columns is-multiline">
+                <div class="column is-6"><div class="chart-box"><p class="is-size-7 has-text-weight-bold has-text-centered mb-2">BILANGAN SEMAKAN (7 HARI TERAKHIR)</p><div id="chartMinggu" style="width:100%; height:200px;"></div></div></div>
+                <div class="column is-6"><div class="chart-box"><p class="is-size-7 has-text-weight-bold has-text-centered mb-2">AGIHAN MENGIKUT SUBJEK</p><div id="chartSubjek" style="width:100%; height:200px;"></div></div></div>
+            </div>
         </div>
 
         <div class="card-menu" id="mainMenu">
             <div class="menu-item" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-pencil-alt icon-isi"></i><span>ISI LAPORAN</span></div>
+            <div class="menu-item" onclick="showSearchMenu()"><i class="fas fa-search-plus icon-semak"></i><span>SEMAK REKOD</span></div>
             <div class="menu-item" onclick="openPdfSearch()"><i class="fas fa-file-pdf icon-arkib"></i><span>FAIL PDF</span></div>
+        </div>
+
+        <div class="card-menu" id="searchMenu">
+            <div class="menu-item" onclick="prepareFilter('GURU')"><i class="fas fa-user-tie has-text-link"></i><span>NAMA GURU</span></div>
+            <div class="menu-item" onclick="prepareFilter('SUBJEK')"><i class="fas fa-book has-text-success"></i><span>MATA PELAJARAN</span></div>
+            <div class="menu-item" onclick="prepareFilter('TARIKH')"><i class="fas fa-calendar-day has-text-warning"></i><span>TARIKH</span></div>
+            <div class="menu-item" onclick="drawAdminRecord()"><i class="fas fa-user-shield has-text-primary"></i><span>REKOD PENTADBIR</span></div>
+            <div style="width: 100%; text-align: center; margin-top: 20px;"><button class="button is-text is-small" onclick="location.reload()"> Kembali ke Menu Utama</button></div>
+        </div>
+
+        <div id="filterPanel">
+            <div class="columns is-vcentered">
+                <div class="column is-8" id="inputContainer"></div>
+                <div class="column is-4" id="btnSearchArea"><button class="button is-link is-fullwidth is-rounded" onclick="drawTable()">CARI DATA</button></div>
+            </div>
+            <div id="resultsTable" class="mt-5"></div>
         </div>
     </div>
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbyJkmYgJXzojMmEgVHuh-aR8GkegycSjAP-Avn_Xw7H0kr13IbVUTiUmNH6Fx-imLMf0A/exec';
         const sheetID = '1T7GcIbxlqQiaBcjE7LaKAUzANhzzGtS--_xDyKXizCg';
+        let currentMode = '';
+
+        google.charts.load('current', {'packages':['corechart', 'table', 'bar']});
+        google.charts.setOnLoadCallback(drawDashboardStats);
 
         function toggleLoader(show) {
             document.getElementById('loader-overlay').style.display = show ? 'flex' : 'none';
         }
 
-        // 1. Fungsi Membuka Halaman Carian PDF & Mengambil Dropdown Subjek
         function openPdfSearch() {
             const mainArea = document.getElementById('mainArea');
             mainArea.innerHTML = `
-                <div style="width:100%; max-width:800px;">
+                <div style="width:100%; max-width:1000px;">
                     <button class="button is-small is-light mb-4" onclick="location.reload()">← Kembali</button>
                     <div class="box" style="border-radius: 20px; padding: 30px;">
                         <h2 class="title is-4 has-text-link"><i class="fas fa-file-pdf mr-2"></i> CARIAN FAIL PDF LAPORAN</h2>
-                        <div class="field">
-                            <label class="label">Pilih Mata Pelajaran</label>
+                        <p class="subtitle is-6 has-text-grey mb-5">Sila masukkan nama guru atau subjek untuk mencari fail PDF terus dari sistem.</p>
+                        <div class="field has-addons">
                             <div class="control is-expanded">
-                                <div class="select is-fullwidth is-link is-rounded">
-                                    <select id="pdfSubjectSelect">
-                                        <option value="">-- Memuatkan Subjek... --</option>
-                                    </select>
-                                </div>
+                                <input class="input is-rounded is-link" id="pdfSearchInput" type="text" placeholder="Taip Nama Guru / Subjek / Tarikh (e.g: Azizah)..." onkeyup="if(event.key==='Enter') drawPdfTable()">
+                            </div>
+                            <div class="control">
+                                <button class="button is-link is-rounded px-6" onclick="drawPdfTable()"><i class="fas fa-search mr-2"></i> CARI</button>
                             </div>
                         </div>
-                        <div class="control mt-4">
-                            <button class="button is-link is-fullwidth is-rounded" onclick="drawPdfTable()">CARI FAIL PDF</button>
-                        </div>
                         <hr>
-                        <div id="pdfResultArea"></div>
+                        <div id="pdfResultArea" style="min-height: 200px;">
+                            <div class="has-text-centered py-6">
+                                <i class="fas fa-search fa-3x has-text-grey-lighter mb-3"></i>
+                                <p class="has-text-grey">Menunggu carian anda...</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
-            fetchSubjectDropdown();
         }
 
-        // 2. Ambil senarai subjek dari tab "tetapan"
-        function fetchSubjectDropdown() {
-            const url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=tetapan&range=A2:A`;
-            
-            fetch(url).then(r => r.text()).then(t => {
-                const j = JSON.parse(t.substr(47).slice(0,-2));
-                const select = document.getElementById('pdfSubjectSelect');
-                select.innerHTML = '<option value="">-- Pilih Mata Pelajaran --</option>';
-                
-                j.table.rows.forEach(r => {
-                    if(r.c[0] && r.c[0].v) {
-                        let opt = document.createElement('option');
-                        opt.value = r.c[0].v;
-                        opt.text = r.c[0].v;
-                        select.add(opt);
-                    }
-                });
-            });
-        }
-
-        // 3. Cari data di tab "rekod_semakan"
         function drawPdfTable() {
-            const subject = document.getElementById('pdfSubjectSelect').value;
-            if (!subject) return alert("Sila pilih mata pelajaran dahulu");
+            const keyword = document.getElementById('pdfSearchInput').value;
+            if (!keyword) return alert("Sila masukkan kata kunci carian");
 
             toggleLoader(true);
-            const resultArea = document.getElementById('pdfResultArea');
-            
-            // Query: Cari subjek di Lajur F (Subjek) dalam tab rekod_semakan
-            let q = encodeURIComponent(`SELECT B, C, F, U WHERE F = '${subject}' ORDER BY B DESC`);
+
+            let q = encodeURIComponent(`SELECT B, C, F, U WHERE (C contains '${keyword}' OR F contains '${keyword}' OR B contains '${keyword}') ORDER BY B DESC`);
             let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
 
             fetch(url).then(r => r.text()).then(t => {
                 let j = JSON.parse(t.substr(47).slice(0,-2));
                 
-                if (!j.table.rows || j.table.rows.length === 0) {
-                    resultArea.innerHTML = `
-                        <div class="notification is-danger is-light has-text-centered">
-                            <i class="fas fa-exclamation-circle mr-2"></i> <strong>Tiada rekod ditemui</strong> untuk subjek ${subject}.
+                if (j.table.rows.length === 0) {
+                    document.getElementById('pdfResultArea').innerHTML = `
+                        <div class="notification is-warning is-light has-text-centered">
+                            <i class="fas fa-exclamation-triangle mr-2"></i> Tiada rekod fail PDF dijumpai untuk <strong>"${keyword}"</strong>.
                         </div>`;
                     return;
                 }
 
                 let html = `
                     <div class="table-container">
-                        <table class="table is-fullwidth is-striped is-hoverable">
+                        <table class="table is-fullwidth is-hoverable is-striped">
                             <thead>
                                 <tr style="background: #eff6ff">
-                                    <th>Tarikh</th>
-                                    <th>Guru</th>
-                                    <th>Tindakan</th>
+                                    <th style="color: #1e40af">Tarikh</th>
+                                    <th style="color: #1e40af">Nama Guru</th>
+                                    <th style="color: #1e40af">Mata Pelajaran</th>
+                                    <th class="has-text-centered" style="color: #1e40af">Tindakan</th>
                                 </tr>
                             </thead>
                             <tbody>`;
 
                 j.table.rows.forEach(r => {
                     let tarikh = r.c[0] ? (r.c[0].f || r.c[0].v) : "-";
-                    let guru = r.c[1]?.v || "-";
+                    let nama = r.c[1]?.v || "-";
+                    let subjek = r.c[2]?.v || "-";
                     let link = r.c[3]?.v;
 
                     html += `
                         <tr>
                             <td class="is-size-7">${tarikh}</td>
-                            <td class="is-size-7 has-text-weight-bold">${guru}</td>
-                            <td>
-                                ${link ? `<a href="${link}" target="_blank" class="button is-small is-danger is-outlined is-rounded"><i class="fas fa-file-pdf"></i></a>` : '<span class="tag is-light">Tiada Fail</span>'}
+                            <td class="is-size-7 has-text-weight-bold">${nama}</td>
+                            <td class="is-size-7">${subjek}</td>
+                            <td class="has-text-centered">
+                                ${link ? `<a href="${link}" target="_blank" class="button is-small is-danger is-outlined is-rounded"><i class="fas fa-file-pdf mr-2"></i> BUKA PDF</a>` : '<span class="tag is-light">Tiada Fail</span>'}
                             </td>
                         </tr>`;
                 });
 
                 html += `</tbody></table></div>`;
-                resultArea.innerHTML = html;
+                document.getElementById('pdfResultArea').innerHTML = html;
             })
             .catch(err => {
-                resultArea.innerHTML = '<p class="has-text-danger">Ralat sistem. Sila cuba lagi.</p>';
+                document.getElementById('pdfResultArea').innerHTML = '<p class="has-text-danger">Ralat memuatkan data. Sila cuba lagi.</p>';
+            })
+            .finally(() => toggleLoader(false));
+        }
+
+        function drawDashboardStats() {
+            toggleLoader(true);
+            const qM = encodeURIComponent("SELECT B, COUNT(C) GROUP BY B ORDER BY B DESC LIMIT 7");
+            const qS = encodeURIComponent("SELECT F, COUNT(C) GROUP BY F");
+            Promise.all([
+                fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${qM}&sheet=rekod_semakan`),
+                fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${qS}&sheet=rekod_semakan`)
+            ])
+            .then(res => Promise.all(res.map(r => r.text())))
+            .then(texts => {
+                let j1 = JSON.parse(texts[0].substr(47).slice(0,-2));
+                let d1 = new google.visualization.DataTable();
+                d1.addColumn('string', 'Tarikh'); d1.addColumn('number', 'Rekod');
+                j1.table.rows.forEach(r => d1.addRow([r.c[0] ? (r.c[0].f || r.c[0].v) : "", r.c[1].v]));
+                new google.visualization.ColumnChart(document.getElementById('chartMinggu')).draw(d1, { colors: ['#1e3a8a'], legend: 'none', chartArea: {width: '80%', height: '70%'} });
+
+                let j2 = JSON.parse(texts[1].substr(47).slice(0,-2));
+                let d2 = new google.visualization.DataTable();
+                d2.addColumn('string', 'Subjek'); d2.addColumn('number', 'Jumlah');
+                j2.table.rows.forEach(r => d2.addRow([r.c[0].v, r.c[1].v]));
+                new google.visualization.PieChart(document.getElementById('chartSubjek')).draw(d2, { pieHole: 0.4, colors: ['#1e3a8a', '#ef4444', '#f59e0b', '#10b981', '#6366f1'], chartArea: {width: '100%', height: '80%'}, legend: {position: 'bottom', textStyle: {fontSize: 10}} });
+            })
+            .finally(() => toggleLoader(false));
+        }
+
+        function drawTable() {
+            const val = document.getElementById('fVal').value;
+            if(!val) return alert("Sila pilih kriteria carian");
+            toggleLoader(true);
+            let q = (currentMode==='GURU') ? `SELECT B, C, F, Q, U WHERE C = '${val}'` : (currentMode==='SUBJEK') ? `SELECT B, C, F, Q, U WHERE F = '${val}'` : `SELECT B, C, F, Q, U WHERE B = '${val.split('-').reverse().join('/')}'`;
+            fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(q)}&sheet=rekod_semakan`)
+            .then(r => r.text()).then(t => {
+                let j = JSON.parse(t.substr(47).slice(0,-2));
+                let dt = new google.visualization.DataTable();
+                dt.addColumn('string', 'Tarikh'); dt.addColumn('string', 'Guru'); dt.addColumn('string', 'Subjek'); dt.addColumn('string', 'Skala'); dt.addColumn('string', 'PDF');
+                dt.addRows(j.table.rows.map(r => [r.c[0] ? (r.c[0].f || r.c[0].v) : "", r.c[1]?.v, r.c[2]?.v, r.c[3]?.v, r.c[4] ? `<a href="${r.c[4].v}" target="_blank" class="button is-small is-link is-outlined">LIHAT PDF</a>` : "Tiada"]));
+                new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml:true, width:'100%', pageSize: 10});
+            })
+            .finally(() => toggleLoader(false));
+        }
+
+        function drawAdminRecord() {
+            toggleLoader(true);
+            document.getElementById('filterPanel').style.display = 'block';
+            document.getElementById('btnSearchArea').style.display = 'none';
+            document.getElementById('inputContainer').innerHTML = '<strong>Ringkasan Aktiviti Pentadbir</strong>';
+            let q = encodeURIComponent(`SELECT S, T, B, C, F, U ORDER BY B DESC`);
+            fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`)
+            .then(r => r.text()).then(t => {
+                let j = JSON.parse(t.substr(47).slice(0,-2));
+                let dt = new google.visualization.DataTable();
+                dt.addColumn('string', 'Pentadbir'); dt.addColumn('string', 'Jawatan'); dt.addColumn('string', 'Tarikh'); dt.addColumn('string', 'Guru'); dt.addColumn('string', 'Subjek'); dt.addColumn('string', 'Fail');
+                dt.addRows(j.table.rows.map(r => [r.c[0]?.v, r.c[1]?.v, r.c[2] ? (r.c[2].f || r.c[2].v) : "", r.c[3]?.v, r.c[4]?.v, r.c[5] ? `<a href="${r.c[5].v}" target="_blank" class="button is-small is-danger is-outlined">PDF</a>` : "Tiada"]));
+                new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml:true, width:'100%', pageSize: 15});
             })
             .finally(() => toggleLoader(false));
         }
 
         function loadFrame(url) {
-            document.getElementById('mainArea').innerHTML = `<div style="width:100%"><button class="button is-small is-light mb-2" onclick="location.reload()">← Kembali</button><iframe src="${url}"></iframe></div>`;
+            const mainArea = document.getElementById('mainArea');
+            mainArea.innerHTML = `<div style="width:100%"><button class="button is-small is-light mb-2" onclick="location.reload()">← Kembali</button><iframe src="${url}"></iframe></div>`;
+        }
+
+        function showSearchMenu() {
+            const mainMenu = document.getElementById('mainMenu'), searchMenu = document.getElementById('searchMenu'), statsSection = document.getElementById('statsSection');
+            if (!mainMenu || !searchMenu) { sessionStorage.setItem('bukaCarian', 'true'); location.reload(); return; }
+            document.getElementById('headerSection').style.display = 'block';
+            if (statsSection) statsSection.style.display = 'none';
+            mainMenu.style.display = 'none'; searchMenu.style.display = 'flex';
+            document.getElementById('filterPanel').style.display = 'none';
+        }
+
+        window.addEventListener('load', function() {
+            if (sessionStorage.getItem('bukaCarian') === 'true') { sessionStorage.removeItem('bukaCarian'); showSearchMenu(); }
+        });
+
+        function prepareFilter(mode) {
+            currentMode = mode;
+            document.getElementById('filterPanel').style.display = 'block';
+            const container = document.getElementById('inputContainer');
+            container.innerHTML = '<p class="is-size-7">Memuatkan data...</p>';
+            fetch(scriptURL + "?getLists=true").then(r => r.json()).then(d => {
+                if (mode === 'GURU') {
+                    let opts = d.guru.map(g => `<option value="${g}">${g}</option>`).join('');
+                    container.innerHTML = `<label class="label is-small">Nama Guru</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Nama --</option>${opts}</select></div>`;
+                } else if (mode === 'SUBJEK') {
+                    let opts = d.subjek.map(s => `<option value="${s}">${s}</option>`).join('');
+                    container.innerHTML = `<label class="label is-small">Mata Pelajaran</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Subjek --</option>${opts}</select></div>`;
+                } else if (mode === 'TARIKH') {
+                    container.innerHTML = `<label class="label is-small">Tarikh</label><input type="date" id="fVal" class="input">`;
+                }
+            });
         }
     </script>
 </body>
