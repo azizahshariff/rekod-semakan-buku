@@ -3,61 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borang Semakan Buku Murid - SK Simpang Rengam</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background-color: #f0f2f5; padding: 20px; }
         .form-card { background: white; max-width: 800px; margin: auto; padding: 30px; border-radius: 15px; border-top: 10px solid #1e3a8a; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        .label { font-size: 0.85rem; }
+        .label { font-size: 0.85rem; margin-bottom: 0.2rem; }
+        .table select { width: 100%; border: none; background: transparent; font-weight: bold; color: #1e3a8a; }
+        .has-background-sksr { background-color: #eff6ff; }
     </style>
 </head>
 <body>
     <div class="form-card">
         <div class="has-text-centered mb-5">
-            <h1 class="title is-4">BORANG SEMAKAN BUKU MURID</h1>
-            <p class="subtitle is-7">Sistem Inovasi Digital D'SiRe</p>
+            <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" alt="Logo SKSR" style="width: 80px;">
+            <h2 class="title is-4 mt-2 mb-1">BORANG SEMAKAN BUKU MURID</h2>
+            <p class="subtitle is-6 has-text-grey">SK SIMPANG RENGAM</p>
+            <hr>
         </div>
 
         <form id="semakForm">
             <div class="columns is-multiline">
-                <div class="column is-12"><label class="label">Nama Guru</label><div class="select is-fullwidth"><select id="namaGuru" required><option value="">Memuatkan senarai...</option></select></div></div>
-                <div class="column is-3"><label class="label">Tahun</label><div class="select is-fullwidth"><select id="tahun" required></select></div></div>
-                <div class="column is-3"><label class="label">Kelas</label><div class="select is-fullwidth"><select id="kelas" required></select></div></div>
-                <div class="column is-6"><label class="label">Matapelajaran</label><div class="select is-fullwidth"><select id="subjek" required></select></div></div>
-                <div class="column is-8"><label class="label">Tajuk Buku</label><input class="input" type="text" id="tajukBuku" required></div>
-                <div class="column is-4"><label class="label">Jumlah Buku</label><input class="input" type="number" id="jumlahBuku" required></div>
+                <div class="column is-12">
+                    <label class="label">Nama Guru</label>
+                    <div class="select is-fullwidth"><select id="namaGuru" required><option value="">Memuatkan senarai...</option></select></div>
+                </div>
+                <div class="column is-3">
+                    <label class="label">Tahun</label>
+                    <div class="select is-fullwidth"><select id="tahun" required></select></div>
+                </div>
+                <div class="column is-3">
+                    <label class="label">Kelas</label>
+                    <div class="select is-fullwidth"><select id="kelas" required></select></div>
+                </div>
+                <div class="column is-6">
+                    <label class="label">Matapelajaran</label>
+                    <div class="select is-fullwidth"><select id="subjek" required></select></div>
+                </div>
+                <div class="column is-8">
+                    <label class="label">Tajuk Buku</label>
+                    <input class="input" type="text" id="tajukBuku" placeholder="Contoh: Buku Aktiviti Jilid 1" required>
+                </div>
+                <div class="column is-4">
+                    <label class="label">Jumlah Buku</label>
+                    <input class="input" type="number" id="jumlahBuku" required>
+                </div>
             </div>
 
-            <div class="box mt-4">
-                <table class="table is-fullwidth is-narrow is-size-7">
-                    <thead><tr class="has-background-link-light"><th>Aspek (1-5)</th><th>Skor</th></tr></thead>
+            <div class="box has-background-sksr mt-4">
+                <p class="label has-text-centered mb-3">SKOR ASPEK SEMAKAN (1-5)</p>
+                <table class="table is-fullwidth is-bordered is-narrow is-size-7">
+                    <thead>
+                        <tr class="has-background-link has-text-white">
+                            <th class="has-text-white">Aspek Penilaian</th>
+                            <th class="has-text-white has-text-centered">Skor</th>
+                        </tr>
+                    </thead>
                     <tbody>
-                        <tr><td>1. Latihan mencukupi</td><td><select id="skor1"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
-                        <tr><td>2. Kekerapan latihan</td><td><select id="skor2"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
-                        <tr><td>3. Ketelitian semakan</td><td><select id="skor3"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
-                        <tr><td>4. Kesegeraan semakan</td><td><select id="skor4"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
-                        <tr><td>5. Ulasan membina</td><td><select id="skor5"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
-                        <tr><td>6. Pembetulan murid</td><td><select id="skor6"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
-                        <tr><td>7. Semakan pembetulan</td><td><select id="skor7"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
+                        <tr><td>1. Latihan / nota mencukupi</td><td><select id="skor1"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
+                        <tr><td>2. Kekerapan latihan mengikut tahap</td><td><select id="skor2"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
+                        <tr><td>3. Ketelitian penyemakan kerja murid</td><td><select id="skor3"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
+                        <tr><td>4. Kesegeraan penyemakan</td><td><select id="skor4"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
+                        <tr><td>5. Ulasan spesifik dan membina</td><td><select id="skor5"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
+                        <tr><td>6. Pembetulan dibuat</td><td><select id="skor6"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
+                        <tr><td>7. Pembetulan disemak segera & teliti</td><td><select id="skor7"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
                     </tbody>
                 </table>
             </div>
 
             <div class="columns is-multiline">
-                <div class="column is-6"><label class="label">Nama Pentadbir</label><div class="select is-fullwidth"><select id="namaPentadbir" required></select></div></div>
-                <div class="column is-6"><label class="label">Jawatan</label><div class="select is-fullwidth"><select id="jawatan" required></select></div></div>
-                <div class="column is-12"><label class="label">Ulasan</label><textarea class="textarea" id="ulasan"></textarea></div>
+                <div class="column is-6">
+                    <label class="label">Nama Pentadbir (Penyemak)</label>
+                    <div class="select is-fullwidth"><select id="namaPentadbir" required></select></div>
+                </div>
+                <div class="column is-6">
+                    <label class="label">Jawatan</label>
+                    <div class="select is-fullwidth"><select id="jawatan" required></select></div>
+                </div>
+                <div class="column is-12">
+                    <label class="label">Ulasan Pentadbir</label>
+                    <textarea class="textarea" id="ulasan" placeholder="Berikan ulasan keseluruhan tentang penyemakan buku..."></textarea>
+                </div>
             </div>
 
-            <button type="submit" id="submitBtn" class="button is-link is-fullwidth mt-5">SIMPAN & JANA PDF</button>
+            <button type="submit" id="submitBtn" class="button is-link is-fullwidth is-medium mt-5">
+                <i class="fas fa-save mr-2"></i> SIMPAN & JANA PDF
+            </button>
         </form>
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyaRhOJiKY4qMnk77KMJaAfpSjzuNxOXYEE8e-1Alyjs4QmW7k7FtMduPiPlf5byEwWwA/exec';
+        // PASTIKAN URL INI ADALAH URL WEB APP TERKINI DARI GOOGLE APPS SCRIPT
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxl7bl7vpd42eyrBKGnLhHFH07vwdm_1uvVclY4vYO_16d_K-RWCKoXbe6_FwnZnL7lDg/exec';
 
         window.onload = function() {
-            // TAMBAHAN ?getLists=true untuk selesaikan masalah dropdown tidak keluar
             fetch(scriptURL + "?getLists=true")
             .then(res => res.json())
             .then(data => {
@@ -72,7 +112,7 @@
 
         function fillSelect(id, list) {
             const s = document.getElementById(id);
-            s.innerHTML = '<option value="">Pilih...</option>';
+            s.innerHTML = '<option value="">-- Pilih --</option>';
             list.forEach(i => s.innerHTML += `<option value="${i}">${i}</option>`);
         }
 
@@ -104,11 +144,14 @@
             .then(res => res.json())
             .then(res => {
                 if(res.result === "success") {
-                    alert("Berjaya!");
+                    alert("Rekod berjaya disimpan! PDF sedang dibuka.");
                     window.open(res.url, '_blank');
                     location.reload();
+                } else {
+                    alert("Ralat: " + res.message);
                 }
             })
+            .catch(error => alert("Ralat sistem: " + error))
             .finally(() => btn.classList.remove('is-loading'));
         });
     </script>
