@@ -3,111 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengurusan Kurikulum - SK Simpang Rengam</title>
+    <title>Pengurusan Unit Kurikulum - SK Simpang Rengam</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
-        :root { --primary: #1e3a8a; --bg: #f4f7fa; --sidebar: 260px; }
-        body { background-color: var(--bg); display: flex; height: 100vh; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
-        
-        .sidebar { width: var(--sidebar); background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
-        .sidebar-header { text-align: center; padding: 30px 20px; }
-        .sidebar-header img { width: 55px; }
-        
-        .nav-link { padding: 12px 25px; display: flex; align-items: center; color: #64748b; cursor: pointer; font-size: 0.85rem; transition: 0.2s; border-radius: 8px; margin: 2px 15px; }
-        .nav-link:hover { background: #f1f5f9; color: var(--primary); }
-        .nav-link.is-active { background: #eff6ff; color: #1e40af; font-weight: 700; }
-        .nav-group-title { padding: 15px 25px 5px; font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
-
-        .main-content { flex-grow: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
-        .header-section { text-align: center; margin-bottom: 40px; }
-        
-        .card-menu { display: flex; justify-content: center; gap: 20px; width: 100%; max-width: 900px; flex-wrap: wrap; }
-        .menu-item { background: white; border-radius: 18px; padding: 40px 20px; text-align: center; cursor: pointer; transition: 0.3s; width: 220px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .menu-item:hover { transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.1); }
-        .menu-item i { font-size: 2.5rem; margin-bottom: 15px; display: block; }
-        .menu-item span { font-weight: 700; font-size: 0.85rem; color: #334155; text-transform: uppercase; }
-
-        #searchMenu { display: none; }
-        #filterPanel { display: none; background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 800px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        iframe { width: 100%; height: 85vh; border: none; border-radius: 15px; }
-        
-        .icon-isi { color: #1e40af; } .icon-semak { color: #ef4444; } .icon-arkib { color: #f59e0b; }
+        :root { --primary: #1e3a8a; --bg: #f4f7fa; }
+        body { background-color: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 260px; background: white; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; }
+        .nav-link { padding: 12px 25px; color: #64748b; cursor: pointer; border-radius: 8px; margin: 2px 15px; }
+        .nav-link:hover, .nav-link.is-active { background: #eff6ff; color: var(--primary); font-weight: 700; }
+        .main-content { flex-grow: 1; overflow-y: auto; padding: 40px; text-align: center; }
+        iframe { width: 100%; height: 85vh; border: none; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .card-menu { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .menu-item { background: white; border-radius: 18px; padding: 30px; width: 200px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .menu-item:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        #searchMenu, #filterPanel { display: none; }
     </style>
 </head>
 <body>
-
     <div class="sidebar">
-        <div class="sidebar-header">
-            <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png">
-            <p style="font-weight: 700; color: var(--primary); font-size: 0.85rem; margin-top: 10px;">REKOD SEMAKAN BUKU MURID</p>
-            <p class="subtitle is-6 has-text-grey">SK Simpang Rengam</p>
-        </div>
-
+        <div class="p-5 text-center"><img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" width="60"><p class="mt-2 has-text-weight-bold" style="color:var(--primary)">SK SIMPANG RENGAM</p></div>
         <div class="nav-link is-active" onclick="location.reload()"><i class="fas fa-home mr-3"></i> Laman Utama</div>
-        
-        <div class="nav-group-title">Menu Utama</div>
         <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit mr-3"></i> Isi Laporan</div>
         <div class="nav-link" onclick="showSearchMenu()"><i class="fas fa-search mr-3"></i> Semak Rekod</div>
-        <div class="nav-link" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')"><i class="fas fa-file-pdf mr-3"></i> Arkib PDF</div>
     </div>
 
     <div class="main-content" id="mainArea">
-        <div id="headerSection" class="header-section">
-            <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" width="70">
-            <h1 class="title is-3" style="color: var(--primary); margin-top: 10px;">PENGURUSAN UNIT KURIKULUM</h1>
-            <p class="subtitle is-6 has-text-grey">SK Simpang Rengam • Rekod Semakan Buku Murid</p>
+        <div id="headerSection" class="mb-6">
+            <h1 class="title is-3" style="color: var(--primary);">PENGURUSAN UNIT KURIKULUM</h1>
+            <p class="subtitle is-6">Rekod Semakan Buku Murid Secara Digital</p>
         </div>
 
         <div class="card-menu" id="mainMenu">
-            <div class="menu-item" onclick="loadFrame('halaman_semak_buku.html')">
-                <i class="fas fa-pencil-alt icon-isi"></i><span>ISI LAPORAN</span>
-            </div>
-            <div class="menu-item" onclick="showSearchMenu()">
-                <i class="fas fa-search-plus icon-semak"></i><span>SEMAK REKOD</span>
-            </div>
-            <div class="menu-item" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')">
-                <i class="fas fa-file-pdf icon-arkib"></i><span>ARKIB PDF</span>
-            </div>
+            <div class="menu-item" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-pencil-alt fa-3x mb-3 has-text-link"></i><br><span>ISI LAPORAN</span></div>
+            <div class="menu-item" onclick="showSearchMenu()"><i class="fas fa-search fa-3x mb-3 has-text-danger"></i><br><span>SEMAK REKOD</span></div>
         </div>
 
         <div class="card-menu" id="searchMenu">
-            <div class="menu-item" onclick="prepareFilter('GURU')">
-                <i class="fas fa-user-tie has-text-link"></i><span>NAMA GURU</span>
-            </div>
-            <div class="menu-item" onclick="prepareFilter('SUBJEK')">
-                <i class="fas fa-book has-text-success"></i><span>MATA PELAJARAN</span>
-            </div>
-            <div class="menu-item" onclick="prepareFilter('TARIKH')">
-                <i class="fas fa-calendar-day has-text-warning"></i><span>TARIKH</span>
-            </div>
-            <div class="menu-item" onclick="drawAdminRecord()">
-                <i class="fas fa-user-shield has-text-primary"></i><span>REKOD PENTADBIR</span>
-            </div>
-            <div style="width: 100%; text-align: center; margin-top: 20px;">
-                <button class="button is-text is-small" onclick="location.reload()"> Kembali ke Menu Utama</button>
-            </div>
+            <div class="menu-item" onclick="prepareFilter('GURU')"><i class="fas fa-user-tie fa-2x mb-2"></i><br>NAMA GURU</div>
+            <div class="menu-item" onclick="prepareFilter('SUBJEK')"><i class="fas fa-book fa-2x mb-2"></i><br>SUBJEK</div>
+            <div class="menu-item" onclick="drawAdminRecord()"><i class="fas fa-shield-alt fa-2x mb-2"></i><br>PENTADBIR</div>
         </div>
 
-        <div id="filterPanel">
-            <div class="columns is-vcentered">
-                <div class="column is-8" id="inputContainer"></div>
-                <div class="column is-4" id="btnSearchArea">
-                    <button class="button is-link is-fullwidth is-rounded" onclick="drawTable()">CARI DATA</button>
-                </div>
-            </div>
+        <div id="filterPanel" class="box mt-5 mx-auto" style="max-width:800px;">
+            <div id="inputContainer"></div>
             <div id="resultsTable" class="mt-5"></div>
         </div>
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxl7bl7vpd42eyrBKGnLhHFH07vwdm_1uvVclY4vYO_16d_K-RWCKoXbe6_FwnZnL7lDg/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby-_Xfhnsdiftrk_YF8rCyyNYDHVASk_WUbQzgFURsiHHlOZJDzbN1epDdqyr68NPoFbw/exec';
         const sheetID = '1T7GcIbxlqQiaBcjE7LaKAUzANhzzGtS--_xDyKXizCg';
-        let currentMode = '';
 
         function loadFrame(url) {
-            document.getElementById('mainArea').innerHTML = `<div style="width:100%"><button class="button is-small is-light mb-2" onclick="location.reload()">← Kembali</button><iframe src="${url}"></iframe></div>`;
+            document.getElementById('mainArea').innerHTML = `<button class="button is-small mb-2" onclick="location.reload()">← Kembali</button><iframe src="${url}"></iframe>`;
         }
 
         function showSearchMenu() {
@@ -116,93 +66,42 @@
         }
 
         function prepareFilter(mode) {
-            currentMode = mode;
             document.getElementById('filterPanel').style.display = 'block';
-            document.getElementById('btnSearchArea').style.display = 'block';
             const container = document.getElementById('inputContainer');
-            container.innerHTML = '<p class="is-size-7">Memuatkan data...</p>';
-
+            container.innerHTML = 'Memuatkan senarai...';
+            
             fetch(scriptURL + "?getLists=true").then(r => r.json()).then(d => {
-                if (mode === 'GURU') {
-                    let opts = d.guru.map(g => `<option value="${g}">${g}</option>`).join('');
-                    container.innerHTML = `<label class="label is-small">Nama Guru</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Nama --</option>${opts}</select></div>`;
-                } 
-                else if (mode === 'SUBJEK') {
-                    let opts = d.subjek.map(s => `<option value="${s}">${s}</option>`).join('');
-                    container.innerHTML = `<label class="label is-small">Mata Pelajaran</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Subjek --</option>${opts}</select></div>`;
-                }
-                else if (mode === 'TARIKH') {
-                    container.innerHTML = `<label class="label is-small">Tarikh</label><input type="date" id="fVal" class="input">`;
-                }
+                let list = mode === 'GURU' ? d.guru : d.subjek;
+                let opts = list.map(i => `<option value="${i}">${i}</option>`).join('');
+                container.innerHTML = `<div class="field has-addons"><div class="control is-expanded"><div class="select is-fullwidth"><select id="fVal">${opts}</select></div></div><div class="control"><button class="button is-link" onclick="drawTable('${mode}')">CARI</button></div></div>`;
             });
         }
 
         google.charts.load('current', {'packages':['table']});
 
-        function drawAdminRecord() {
-            document.getElementById('filterPanel').style.display = 'block';
-            document.getElementById('btnSearchArea').style.display = 'none';
-            document.getElementById('inputContainer').innerHTML = '<strong>Ringkasan Aktiviti Pentadbir (Rekod & PDF)</strong>';
-            
-            // Query dikemaskini untuk mengambil:
-            // S (Pentadbir), T (Jawatan), B (Tarikh), C (Guru), F (Subjek), U (Link PDF)
-            let q = encodeURIComponent(`SELECT S, T, B, C, F, U ORDER BY B DESC LABEL S 'Penyemak', T 'Jawatan', B 'Tarikh', C 'Guru Disemak', F 'Mata Pelajaran', U 'Laporan'`);
-            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
-
-            fetch(url).then(r => r.text()).then(t => {
-                let j = JSON.parse(t.substr(47).slice(0,-2));
-                let dt = new google.visualization.DataTable();
-                
-                dt.addColumn('string', 'Penyemak'); 
-                dt.addColumn('string', 'Jawatan'); 
-                dt.addColumn('string', 'Tarikh'); 
-                dt.addColumn('string', 'Guru Disemak'); 
-                dt.addColumn('string', 'Mata Pelajaran'); 
-                dt.addColumn('string', 'Laporan'); // Lajur baru untuk PDF
-
-                let rows = j.table.rows.map(r => {
-                    let tarikhVal = "";
-                    if (r.c[2]) {
-                        tarikhVal = r.c[2].f ? r.c[2].f : r.c[2].v;
-                    }
-
-                    // Ambil link PDF dari lajur U (index 5 dalam query)
-                    let pdfLink = r.c[5] ? `<a href="${r.c[5].v}" target="_blank" class="button is-small is-danger is-outlined"><i class="fas fa-file-pdf mr-1"></i> PDF</a>` : "<span class='has-text-grey-light'>Tiada</span>";
-
-                    return [
-                        r.c[0] ? r.c[0].v : "", 
-                        r.c[1] ? r.c[1].v : "", 
-                        tarikhVal, 
-                        r.c[3] ? r.c[3].v : "", 
-                        r.c[4] ? r.c[4].v : "",
-                        pdfLink
-                    ];
-                });
-
-                dt.addRows(rows);
-                new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {
-                    width: '100%', 
-                    pageSize: 15,
-                    alternatingRowStyle: true,
-                    allowHtml: true // MESTI TRUE untuk paparkan butang PDF
-                });
-            });
-        }
-
-        function drawTable() {
+        function drawTable(mode) {
             const val = document.getElementById('fVal').value;
-            let q = "";
-            if(currentMode==='GURU') q = `SELECT B, C, F, Q, U WHERE C = '${val}'`;
-            if(currentMode==='SUBJEK') q = `SELECT B, C, F, Q, U WHERE F = '${val}'`;
-            if(currentMode==='TARIKH') { let d = val.split('-'); q = `SELECT B, C, F, Q, U WHERE B = '${d[2]}/${d[1]}/${d[0]}'`; }
-
-            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(q)}&sheet=rekod_semakan`;
-
-            fetch(url).then(r => r.text()).then(t => {
+            let q = mode === 'GURU' ? `SELECT B, C, F, Q, U WHERE C = '${val}'` : `SELECT B, C, F, Q, U WHERE F = '${val}'`;
+            fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(q)}&sheet=rekod_semakan`)
+            .then(r => r.text()).then(t => {
                 let j = JSON.parse(t.substr(47).slice(0,-2));
                 let dt = new google.visualization.DataTable();
                 dt.addColumn('string', 'Tarikh'); dt.addColumn('string', 'Guru'); dt.addColumn('string', 'Subjek'); dt.addColumn('string', 'Skala'); dt.addColumn('string', 'PDF');
-                dt.addRows(j.table.rows.map(r => [r.c[0].f, r.c[1].v, r.c[2].v, r.c[3].v, `<a href="${r.c[4].v}" target="_blank" class="button is-small is-link is-outlined">LIHAT</a>`]));
+                dt.addRows(j.table.rows.map(r => [r.c[0].f, r.c[1].v, r.c[2].v, r.c[3].v, `<a href="${r.c[4].v}" target="_blank" class="button is-small is-danger">PDF</a>`]));
+                new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml:true, width:'100%', pageSize: 10});
+            });
+        }
+
+        function drawAdminRecord() {
+            document.getElementById('filterPanel').style.display = 'block';
+            document.getElementById('inputContainer').innerHTML = '<strong>Rekod Semakan Pentadbir</strong>';
+            let q = encodeURIComponent(`SELECT S, T, B, C, F, U ORDER BY B DESC`);
+            fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`)
+            .then(r => r.text()).then(t => {
+                let j = JSON.parse(t.substr(47).slice(0,-2));
+                let dt = new google.visualization.DataTable();
+                dt.addColumn('string', 'Pentadbir'); dt.addColumn('string', 'Jawatan'); dt.addColumn('string', 'Tarikh'); dt.addColumn('string', 'Guru'); dt.addColumn('string', 'Subjek'); dt.addColumn('string', 'Fail');
+                dt.addRows(j.table.rows.map(r => [r.c[0].v, r.c[1].v, r.c[2].f || r.c[2].v, r.c[3].v, r.c[4].v, `<a href="${r.c[5].v}" target="_blank" class="button is-small is-danger">LINK</a>`]));
                 new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml:true, width:'100%', pageSize: 10});
             });
         }
