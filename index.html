@@ -38,7 +38,6 @@
         .stats-container { width: 100%; max-width: 900px; margin-bottom: 20px; }
         .chart-box { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 260px; }
 
-        /* --- 1. CSS LOADING SPINNER --- */
         #loader-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 255, 255, 0.85);
@@ -67,9 +66,13 @@
             <p class="subtitle is-6 has-text-grey">SK Simpang Rengam</p>
         </div>
         <div class="nav-link is-active" onclick="location.reload()"><i class="fas fa-home mr-3"></i> Laman Utama</div>
+        
         <div class="nav-group-title">Menu Utama</div>
         <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit mr-3"></i> Isi Laporan</div>
         <div class="nav-link" onclick="showSearchMenu()"><i class="fas fa-search mr-3"></i> Semak Rekod</div>
+        
+        <div class="nav-link" onclick="openPdfSearch()"><i class="fas fa-file-search mr-3"></i> Fail PDF</div>
+        
         <div class="nav-link" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')"><i class="fas fa-file-pdf mr-3"></i> Arkib PDF</div>
     </div>
 
@@ -90,7 +93,7 @@
         <div class="card-menu" id="mainMenu">
             <div class="menu-item" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-pencil-alt icon-isi"></i><span>ISI LAPORAN</span></div>
             <div class="menu-item" onclick="showSearchMenu()"><i class="fas fa-search-plus icon-semak"></i><span>SEMAK REKOD</span></div>
-            <div class="menu-item" onclick="loadFrame('https://drive.google.com/embeddedfolderview?id=1MFgY7V2QDDZzg8251P5qZvyoAbgFcwb7#list')"><i class="fas fa-file-pdf icon-arkib"></i><span>ARKIB PDF</span></div>
+            <div class="menu-item" onclick="openPdfSearch()"><i class="fas fa-file-pdf icon-arkib"></i><span>FAIL PDF</span></div>
         </div>
 
         <div class="card-menu" id="searchMenu">
@@ -118,30 +121,116 @@
         google.charts.load('current', {'packages':['corechart', 'table', 'bar']});
         google.charts.setOnLoadCallback(drawDashboardStats);
 
-        // --- 3. FUNGSI LOADER & JAVASCRIPT DIKEMASKINI ---
         function toggleLoader(show) {
             document.getElementById('loader-overlay').style.display = show ? 'flex' : 'none';
         }
 
+        // 2. TAMBAH FUNGSI OPENPDFSEARCH & DRAWPDFTABLE
+        function openPdfSearch() {
+            const mainArea = document.getElementById('mainArea');
+            mainArea.innerHTML = `
+                <div style="width:100%; max-width:1000px;">
+                    <button class="button is-small is-light mb-4" onclick="location.reload()">← Kembali</button>
+                    <div class="box" style="border-radius: 20px; padding: 30px;">
+                        <h2 class="title is-4 has-text-link"><i class="fas fa-file-pdf mr-2"></i> CARIAN FAIL PDF LAPORAN</h2>
+                        <p class="subtitle is-6 has-text-grey mb-5">Sila masukkan nama guru atau subjek untuk mencari fail PDF terus dari sistem.</p>
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
+                                <input class="input is-rounded is-link" id="pdfSearchInput" type="text" placeholder="Taip Nama Guru / Subjek / Tarikh (e.g: Azizah)..." onkeyup="if(event.key==='Enter') drawPdfTable()">
+                            </div>
+                            <div class="control">
+                                <button class="button is-link is-rounded px-6" onclick="drawPdfTable()"><i class="fas fa-search mr-2"></i> CARI</button>
+                            </div>
+                        </div>
+                        <hr>
+                        <div id="pdfResultArea" style="min-height: 200px;">
+                            <div class="has-text-centered py-6">
+                                <i class="fas fa-search fa-3x has-text-grey-lighter mb-3"></i>
+                                <p class="has-text-grey">Menunggu carian anda...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function drawPdfTable() {
+            const keyword = document.getElementById('pdfSearchInput').value;
+            if (!keyword) return alert("Sila masukkan kata kunci carian");
+
+            toggleLoader(true);
+
+            // Query: Tapis berdasarkan Guru (C) atau Subjek (F) atau Tarikh (B)
+            let q = encodeURIComponent(`SELECT B, C, F, U WHERE (C contains '${keyword}' OR F contains '${keyword}' OR B contains '${keyword}') ORDER BY B DESC`);
+            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
+
+            fetch(url).then(r => r.text()).then(t => {
+                let j = JSON.parse(t.substr(47).slice(0,-2));
+                
+                if (j.table.rows.length === 0) {
+                    document.getElementById('pdfResultArea').innerHTML = `
+                        <div class="notification is-warning is-light has-text-centered">
+                            <i class="fas fa-exclamation-triangle mr-2"></i> Tiada rekod fail PDF dijumpai untuk <strong>"${keyword}"</strong>.
+                        </div>`;
+                    return;
+                }
+
+                let html = `
+                    <div class="table-container">
+                        <table class="table is-fullwidth is-hoverable is-striped">
+                            <thead>
+                                <tr style="background: #eff6ff">
+                                    <th style="color: #1e40af">Tarikh</th>
+                                    <th style="color: #1e40af">Nama Guru</th>
+                                    <th style="color: #1e40af">Mata Pelajaran</th>
+                                    <th class="has-text-centered" style="color: #1e40af">Tindakan</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
+                j.table.rows.forEach(r => {
+                    let tarikh = r.c[0] ? (r.c[0].f || r.c[0].v) : "-";
+                    let nama = r.c[1]?.v || "-";
+                    let subjek = r.c[2]?.v || "-";
+                    let link = r.c[3]?.v;
+
+                    html += `
+                        <tr>
+                            <td class="is-size-7">${tarikh}</td>
+                            <td class="is-size-7 has-text-weight-bold">${nama}</td>
+                            <td class="is-size-7">${subjek}</td>
+                            <td class="has-text-centered">
+                                ${link ? `<a href="${link}" target="_blank" class="button is-small is-danger is-outlined is-rounded"><i class="fas fa-file-pdf mr-2"></i> BUKA PDF</a>` : '<span class="tag is-light">Tiada Fail</span>'}
+                            </td>
+                        </tr>`;
+                });
+
+                html += `</tbody></table></div>`;
+                document.getElementById('pdfResultArea').innerHTML = html;
+            })
+            .catch(err => {
+                document.getElementById('pdfResultArea').innerHTML = '<p class="has-text-danger">Ralat memuatkan data. Sila cuba lagi.</p>';
+            })
+            .finally(() => toggleLoader(false));
+        }
+
+        // --- FUNGSI ASAL YANG DIKEKALKAN ---
         function drawDashboardStats() {
             toggleLoader(true);
             const qM = encodeURIComponent("SELECT B, COUNT(C) GROUP BY B ORDER BY B DESC LIMIT 7");
             const qS = encodeURIComponent("SELECT F, COUNT(C) GROUP BY F");
-            
             Promise.all([
                 fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${qM}&sheet=rekod_semakan`),
                 fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${qS}&sheet=rekod_semakan`)
             ])
             .then(res => Promise.all(res.map(r => r.text())))
             .then(texts => {
-                // Graf Mingguan
                 let j1 = JSON.parse(texts[0].substr(47).slice(0,-2));
                 let d1 = new google.visualization.DataTable();
                 d1.addColumn('string', 'Tarikh'); d1.addColumn('number', 'Rekod');
                 j1.table.rows.forEach(r => d1.addRow([r.c[0] ? (r.c[0].f || r.c[0].v) : "", r.c[1].v]));
                 new google.visualization.ColumnChart(document.getElementById('chartMinggu')).draw(d1, { colors: ['#1e3a8a'], legend: 'none', chartArea: {width: '80%', height: '70%'} });
 
-                // Graf Subjek
                 let j2 = JSON.parse(texts[1].substr(47).slice(0,-2));
                 let d2 = new google.visualization.DataTable();
                 d2.addColumn('string', 'Subjek'); d2.addColumn('number', 'Jumlah');
@@ -184,7 +273,6 @@
             .finally(() => toggleLoader(false));
         }
 
-        // Fungsi sokongan sedia ada
         function loadFrame(url) {
             const mainArea = document.getElementById('mainArea');
             if (url.includes('drive.google.com')) {
