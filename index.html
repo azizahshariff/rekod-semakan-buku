@@ -125,7 +125,7 @@
             document.getElementById('loader-overlay').style.display = show ? 'flex' : 'none';
         }
 
-        // 2. TAMBAH FUNGSI OPENPDFSEARCH & DRAWPDFTABLE
+        // --- KEMASKINI: FUNGSI FAIL PDF DENGAN 3 INPUT SERENTAK ---
         function openPdfSearch() {
             const mainArea = document.getElementById('mainArea');
             mainArea.innerHTML = `
@@ -133,35 +133,71 @@
                     <button class="button is-small is-light mb-4" onclick="location.reload()">← Kembali</button>
                     <div class="box" style="border-radius: 20px; padding: 30px;">
                         <h2 class="title is-4 has-text-link"><i class="fas fa-file-pdf mr-2"></i> CARIAN FAIL PDF LAPORAN</h2>
-                        <p class="subtitle is-6 has-text-grey mb-5">Sila masukkan nama guru atau subjek untuk mencari fail PDF terus dari sistem.</p>
-                        <div class="field has-addons">
-                            <div class="control is-expanded">
-                                <input class="input is-rounded is-link" id="pdfSearchInput" type="text" placeholder="Taip Nama Guru / Subjek / Tarikh (e.g: Azizah)..." onkeyup="if(event.key==='Enter') drawPdfTable()">
+                        
+                        <div class="columns is-multiline">
+                            <div class="column is-4">
+                                <label class="label is-small">Nama Guru</label>
+                                <div class="select is-fullwidth is-rounded">
+                                    <select id="pdfGuru"><option value="">-- Semua Guru --</option></select>
+                                </div>
                             </div>
-                            <div class="control">
-                                <button class="button is-link is-rounded px-6" onclick="drawPdfTable()"><i class="fas fa-search mr-2"></i> CARI</button>
+                            <div class="column is-4">
+                                <label class="label is-small">Mata Pelajaran</label>
+                                <div class="select is-fullwidth is-rounded">
+                                    <select id="pdfSubjek"><option value="">-- Semua Subjek --</option></select>
+                                </div>
+                            </div>
+                            <div class="column is-4">
+                                <label class="label is-small">Tarikh</label>
+                                <input type="date" id="pdfTarikh" class="input is-rounded">
                             </div>
                         </div>
+
+                        <div class="has-text-centered mt-4">
+                            <button class="button is-link is-rounded px-6" onclick="drawPdfTable()">
+                                <i class="fas fa-search mr-2"></i> CARI REKOD
+                            </button>
+                        </div>
+
                         <hr>
                         <div id="pdfResultArea" style="min-height: 200px;">
                             <div class="has-text-centered py-6">
-                                <i class="fas fa-search fa-3x has-text-grey-lighter mb-3"></i>
-                                <p class="has-text-grey">Menunggu carian anda...</p>
+                                <i class="fas fa-filter fa-3x has-text-grey-lighter mb-3"></i>
+                                <p class="has-text-grey">Sila pilih kriteria dan klik Cari</p>
                             </div>
                         </div>
                     </div>
                 </div>
             `;
+
+            // Muatkan senarai dropdown secara dinamik
+            fetch(scriptURL + "?getLists=true").then(r => r.json()).then(d => {
+                const sGuru = document.getElementById('pdfGuru');
+                const sSubjek = document.getElementById('pdfSubjek');
+                d.guru.forEach(g => { sGuru.innerHTML += `<option value="${g}">${g}</option>`; });
+                d.subjek.forEach(s => { sSubjek.innerHTML += `<option value="${s}">${s}</option>`; });
+            });
         }
 
         function drawPdfTable() {
-            const keyword = document.getElementById('pdfSearchInput').value;
-            if (!keyword) return alert("Sila masukkan kata kunci carian");
-
+            const guru = document.getElementById('pdfGuru').value;
+            const subjek = document.getElementById('pdfSubjek').value;
+            const tarikhRaw = document.getElementById('pdfTarikh').value;
+            
             toggleLoader(true);
 
-            // Query: Tapis berdasarkan Guru (C) atau Subjek (F) atau Tarikh (B)
-            let q = encodeURIComponent(`SELECT B, C, F, U WHERE (C contains '${keyword}' OR F contains '${keyword}' OR B contains '${keyword}') ORDER BY B DESC`);
+            // Bina syarat query secara dinamik (AND logic)
+            let conditions = [];
+            if (guru) conditions.push(`C = '${guru}'`);
+            if (subjek) conditions.push(`F = '${subjek}'`);
+            if (tarikhRaw) {
+                const d = tarikhRaw.split('-');
+                const formattedDate = `${d[2]}/${d[1]}/${d[0]}`;
+                conditions.push(`B = '${formattedDate}'`);
+            }
+
+            let whereClause = conditions.length > 0 ? "WHERE " + conditions.join(" AND ") : "";
+            let q = encodeURIComponent(`SELECT B, C, F, U ${whereClause} ORDER BY B DESC`);
             let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
 
             fetch(url).then(r => r.text()).then(t => {
@@ -170,7 +206,7 @@
                 if (j.table.rows.length === 0) {
                     document.getElementById('pdfResultArea').innerHTML = `
                         <div class="notification is-warning is-light has-text-centered">
-                            <i class="fas fa-exclamation-triangle mr-2"></i> Tiada rekod fail PDF dijumpai untuk <strong>"${keyword}"</strong>.
+                            <i class="fas fa-exclamation-triangle mr-2"></i> Tiada rekod fail PDF dijumpai untuk kriteria tersebut.
                         </div>`;
                     return;
                 }
