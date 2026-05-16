@@ -6,87 +6,80 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary-color: #1e3a8a; }
         body { background-color: #f0f2f5; padding: 20px; }
-        .form-card { background: white; max-width: 800px; margin: auto; padding: 30px; border-radius: 15px; border-top: 10px solid var(--primary-color); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        .label { font-size: 0.85rem; color: #4a4a4a; }
-        .table select { width: 100%; border: 1px solid #ddd; border-radius: 4px; padding: 3px; }
+        .form-card { background: white; max-width: 800px; margin: auto; padding: 30px; border-radius: 15px; border-top: 10px solid #1e3a8a; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .label { font-size: 0.85rem; }
     </style>
 </head>
 <body>
     <div class="form-card">
         <div class="has-text-centered mb-5">
-            <h1 class="title is-4">REKOD SEMAKAN BUKU MURID</h1>
-            <p class="subtitle is-7">SK SIMPANG RENGAM | Inovasi Digital D'SiRe</p>
+            <h1 class="title is-4">BORANG SEMAKAN BUKU MURID</h1>
+            <p class="subtitle is-7">Sistem Inovasi Digital D'SiRe</p>
         </div>
 
         <form id="semakForm">
             <div class="columns is-multiline">
-                <div class="column is-12"><label class="label">Nama Guru</label><div class="select is-fullwidth"><select id="namaGuru" required><option value="">Memuatkan senarai guru...</option></select></div></div>
+                <div class="column is-12"><label class="label">Nama Guru</label><div class="select is-fullwidth"><select id="namaGuru" required><option value="">Memuatkan senarai...</option></select></div></div>
                 <div class="column is-3"><label class="label">Tahun</label><div class="select is-fullwidth"><select id="tahun" required></select></div></div>
                 <div class="column is-3"><label class="label">Kelas</label><div class="select is-fullwidth"><select id="kelas" required></select></div></div>
                 <div class="column is-6"><label class="label">Matapelajaran</label><div class="select is-fullwidth"><select id="subjek" required></select></div></div>
-                <div class="column is-8"><label class="label">Tajuk Buku / Unit</label><input class="input" type="text" id="tajukBuku" placeholder="Contoh: Unit 1 - Nombor Bulat" required></div>
+                <div class="column is-8"><label class="label">Tajuk Buku</label><input class="input" type="text" id="tajukBuku" required></div>
                 <div class="column is-4"><label class="label">Jumlah Buku</label><input class="input" type="number" id="jumlahBuku" required></div>
             </div>
 
-            <div class="box has-background-light mt-4">
-                <table class="table is-fullwidth is-bordered is-narrow">
-                    <thead class="has-background-link">
-                        <tr><th class="has-text-white is-size-7">Aspek Semakan (Skor 1-5)</th><th class="has-text-centered has-text-white is-size-7" style="width: 80px;">Skor</th></tr>
-                    </thead>
-                    <tbody class="is-size-7">
-                        <tr><td>1. Latihan / nota mencukupi</td><td><select id="skor1"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></td></tr>
-                        <tr><td>2. Kekerapan latihan mengikut tahap kebolehan murid</td><td><select id="skor2"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></td></tr>
-                        <tr><td>3. Ketelitian penyemakan kerja murid</td><td><select id="skor3"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></td></tr>
-                        <tr><td>4. Kesegeraan penyemakan</td><td><select id="skor4"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></td></tr>
-                        <tr><td>5. Ulasan spesifik dan membina</td><td><select id="skor5"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></td></tr>
-                        <tr><td>6. Pembetulan dibuat</td><td><select id="skor6"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></td></tr>
-                        <tr><td>7. Pembetulan disemak dengan segera dan teliti</td><td><select id="skor7"><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option></select></td></tr>
+            <div class="box mt-4">
+                <table class="table is-fullwidth is-narrow is-size-7">
+                    <thead><tr class="has-background-link-light"><th>Aspek (1-5)</th><th>Skor</th></tr></thead>
+                    <tbody>
+                        <tr><td>1. Latihan mencukupi</td><td><select id="skor1"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
+                        <tr><td>2. Kekerapan latihan</td><td><select id="skor2"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
+                        <tr><td>3. Ketelitian semakan</td><td><select id="skor3"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
+                        <tr><td>4. Kesegeraan semakan</td><td><select id="skor4"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
+                        <tr><td>5. Ulasan membina</td><td><select id="skor5"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
+                        <tr><td>6. Pembetulan murid</td><td><select id="skor6"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
+                        <tr><td>7. Semakan pembetulan</td><td><select id="skor7"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <div class="columns is-multiline mt-2">
+            <div class="columns is-multiline">
                 <div class="column is-6"><label class="label">Nama Pentadbir</label><div class="select is-fullwidth"><select id="namaPentadbir" required></select></div></div>
                 <div class="column is-6"><label class="label">Jawatan</label><div class="select is-fullwidth"><select id="jawatan" required></select></div></div>
-                <div class="column is-12"><label class="label">Ulasan Pentadbir</label><textarea class="textarea" id="ulasan" placeholder="Berikan ulasan membina di sini..."></textarea></div>
+                <div class="column is-12"><label class="label">Ulasan</label><textarea class="textarea" id="ulasan"></textarea></div>
             </div>
 
-            <button type="submit" id="submitBtn" class="button is-link is-fullwidth mt-5 has-text-weight-bold">
-                <i class="fas fa-save mr-2"></i> SIMPAN & JANA PDF
-            </button>
+            <button type="submit" id="submitBtn" class="button is-link is-fullwidth mt-5">SIMPAN & JANA PDF</button>
         </form>
     </div>
 
     <script>
-        // GANTIKAN DENGAN URL WEB APP TUAN YANG TERKINI
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxLGejeUfSgvIAI517G0KdL6WLdcl5Bm3zxNirC1imqM0XfPl7ktlcjpEp-Mxfn8kDLKw/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby-_Xfhnsdiftrk_YF8rCyyNYDHVASk_WUbQzgFURsiHHlOZJDzbN1epDdqyr68NPoFbw/exec';
 
         window.onload = function() {
-            fetch(scriptURL).then(res => res.json()).then(data => {
-                populateSelect('namaGuru', data.guru);
-                populateSelect('tahun', data.tahun);
-                populateSelect('kelas', data.kelas);
-                populateSelect('subjek', data.subjek);
-                populateSelect('namaPentadbir', data.pentadbir);
-                populateSelect('jawatan', data.jawatan);
+            // TAMBAHAN ?getLists=true untuk selesaikan masalah dropdown tidak keluar
+            fetch(scriptURL + "?getLists=true")
+            .then(res => res.json())
+            .then(data => {
+                fillSelect('namaGuru', data.guru);
+                fillSelect('tahun', data.tahun);
+                fillSelect('kelas', data.kelas);
+                fillSelect('subjek', data.subjek);
+                fillSelect('namaPentadbir', data.pentadbir);
+                fillSelect('jawatan', data.jawatan);
             });
         };
 
-        function populateSelect(id, list) {
-            const select = document.getElementById(id);
-            select.innerHTML = '<option value="">Pilih...</option>';
-            [...new Set(list)].forEach(item => {
-                if(item) select.innerHTML += `<option value="${item}">${item}</option>`;
-            });
+        function fillSelect(id, list) {
+            const s = document.getElementById(id);
+            s.innerHTML = '<option value="">Pilih...</option>';
+            list.forEach(i => s.innerHTML += `<option value="${i}">${i}</option>`);
         }
 
         document.getElementById('semakForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.classList.add('is-loading');
-            btn.disabled = true;
 
             const payload = {
                 namaGuru: document.getElementById('namaGuru').value,
@@ -111,21 +104,12 @@
             .then(res => res.json())
             .then(res => {
                 if(res.result === "success") {
-                    alert("Rekod Berjaya Disimpan!");
-                    window.open(res.url, '_blank'); // Buka PDF
+                    alert("Berjaya!");
+                    window.open(res.url, '_blank');
                     location.reload();
-                } else {
-                    alert("Ralat: " + res.message);
                 }
             })
-            .catch(error => {
-                alert("Ralat sambungan ke server!");
-                console.error(error);
-            })
-            .finally(() => {
-                btn.classList.remove('is-loading');
-                btn.disabled = false;
-            });
+            .finally(() => btn.classList.remove('is-loading'));
         });
     </script>
 </body>
