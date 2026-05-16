@@ -107,8 +107,61 @@
         const sheetID = '1T7GcIbxlqQiaBcjE7LaKAUzANhzzGtS--_xDyKXizCg';
         let currentMode = '';
 
+        // --- FUNGSI NAVIGASI (DIBAIKI) ---
         function loadFrame(url) {
-            document.getElementById('mainArea').innerHTML = `<div style="width:100%"><button class="button is-small is-light mb-2" onclick="location.reload()">← Kembali</button><iframe src="${url}"></iframe></div>`;
+            const mainArea = document.getElementById('mainArea');
+            
+            // Jika URL adalah Arkib Google Drive
+            if (url.includes('drive.google.com')) {
+                mainArea.innerHTML = `
+                    <div style="width:100%; max-width:1000px;">
+                        <div class="level mb-4">
+                            <div class="level-left">
+                                <button class="button is-small is-light" onclick="location.reload()">← Kembali</button>
+                            </div>
+                            <div class="level-item">
+                                <h2 class="title is-4 has-text-link"><i class="fas fa-archive mr-2"></i> ARKIB LAPORAN PDF</h2>
+                            </div>
+                        </div>
+                        
+                        <div class="box" style="padding: 0; overflow: hidden; border-radius: 15px; border: 2px solid #e2e8f0;">
+                            <div style="background: #1e3a8a; color: white; padding: 10px 20px; font-size: 0.8rem;">
+                                <i class="fas fa-folder-open mr-2"></i> Folder: Laporan Semakan Buku Murid (Google Drive)
+                            </div>
+                            <iframe src="${url}" style="width:100%; height:75vh; border:none;"></iframe>
+                        </div>
+                        
+                        <p class="has-text-centered is-size-7 has-text-grey mt-3">
+                            *Gunakan butang 'Pop-out' di atas kanan folder jika paparan Drive tidak muncul sempurna.
+                        </p>
+                    </div>`;
+            } else {
+                // Untuk borang biasa (Isi Laporan)
+                mainArea.innerHTML = `
+                    <div style="width:100%">
+                        <button class="button is-small is-light mb-2" onclick="location.reload()">← Kembali</button>
+                        <iframe src="${url}"></iframe>
+                    </div>`;
+            }
+        }
+
+        function showSearchMenu() {
+            // Jika mainArea telah diganti dengan iframe, kita perlu bina semula struktur Menu Carian
+            const mainArea = document.getElementById('mainArea');
+            
+            // Semak jika searchMenu masih wujud dalam DOM
+            if (!document.getElementById('searchMenu')) {
+                // Jika tidak wujud (sebab dah kena overwrite oleh loadFrame), kita reload untuk kembalikan struktur asal
+                // Kemudian set mode ke search menu selepas reload (atau bina semula innerHTML)
+                location.reload(); 
+                return;
+            }
+
+            // Jika masih wujud, kita tukar paparan seperti biasa
+            document.getElementById('headerSection').style.display = 'block';
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('searchMenu').style.display = 'flex';
+            document.getElementById('filterPanel').style.display = 'none';
         }
 
         function showSearchMenu() {
