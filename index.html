@@ -151,63 +151,72 @@
         }
 
         function drawPdfTable() {
-            const keyword = document.getElementById('pdfSearchInput').value;
-            if (!keyword) return alert("Sila masukkan kata kunci carian");
+    const keyword = document.getElementById('pdfSearchInput').value;
+    if (!keyword) return alert("Sila masukkan kata kunci carian");
 
-            toggleLoader(true);
+    toggleLoader(true);
 
-            let q = encodeURIComponent(`SELECT B, C, F, U WHERE (C contains '${keyword}' OR F contains '${keyword}' OR B contains '${keyword}') ORDER BY B DESC`);
-            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
+    // Query: Mencari kata kunci pada Lajur C (Guru), Lajur F (Subjek), atau Lajur B (Tarikh)
+    let q = encodeURIComponent(`SELECT B, C, F, U WHERE (C contains '${keyword}' OR F contains '${keyword}' OR B contains '${keyword}') ORDER BY B DESC`);
+    let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
 
-            fetch(url).then(r => r.text()).then(t => {
-                let j = JSON.parse(t.substr(47).slice(0,-2));
-                
-                if (j.table.rows.length === 0) {
-                    document.getElementById('pdfResultArea').innerHTML = `
-                        <div class="notification is-warning is-light has-text-centered">
-                            <i class="fas fa-exclamation-triangle mr-2"></i> Tiada rekod fail PDF dijumpai untuk <strong>"${keyword}"</strong>.
-                        </div>`;
-                    return;
-                }
-
-                let html = `
-                    <div class="table-container">
-                        <table class="table is-fullwidth is-hoverable is-striped">
-                            <thead>
-                                <tr style="background: #eff6ff">
-                                    <th style="color: #1e40af">Tarikh</th>
-                                    <th style="color: #1e40af">Nama Guru</th>
-                                    <th style="color: #1e40af">Mata Pelajaran</th>
-                                    <th class="has-text-centered" style="color: #1e40af">Tindakan</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
-
-                j.table.rows.forEach(r => {
-                    let tarikh = r.c[0] ? (r.c[0].f || r.c[0].v) : "-";
-                    let nama = r.c[1]?.v || "-";
-                    let subjek = r.c[2]?.v || "-";
-                    let link = r.c[3]?.v;
-
-                    html += `
-                        <tr>
-                            <td class="is-size-7">${tarikh}</td>
-                            <td class="is-size-7 has-text-weight-bold">${nama}</td>
-                            <td class="is-size-7">${subjek}</td>
-                            <td class="has-text-centered">
-                                ${link ? `<a href="${link}" target="_blank" class="button is-small is-danger is-outlined is-rounded"><i class="fas fa-file-pdf mr-2"></i> BUKA PDF</a>` : '<span class="tag is-light">Tiada Fail</span>'}
-                            </td>
-                        </tr>`;
-                });
-
-                html += `</tbody></table></div>`;
-                document.getElementById('pdfResultArea').innerHTML = html;
-            })
-            .catch(err => {
-                document.getElementById('pdfResultArea').innerHTML = '<p class="has-text-danger">Ralat memuatkan data. Sila cuba lagi.</p>';
-            })
-            .finally(() => toggleLoader(false));
+    fetch(url).then(r => r.text()).then(t => {
+        // Membersihkan respon JSON dari Google
+        let j = JSON.parse(t.substr(47).slice(0,-2));
+        
+        // Semakan jika data kosong
+        if (!j.table.rows || j.table.rows.length === 0) {
+            document.getElementById('pdfResultArea').innerHTML = `
+                <div class="notification is-danger is-light has-text-centered">
+                    <i class="fas fa-search-minus mr-2"></i> <strong>Tiada rekod ditemui</strong> untuk kata kunci "${keyword}".
+                </div>`;
+            return;
         }
+
+        let html = `
+            <div class="table-container">
+                <table class="table is-fullwidth is-hoverable is-striped">
+                    <thead>
+                        <tr style="background: #eff6ff">
+                            <th style="color: #1e40af">Tarikh</th>
+                            <th style="color: #1e40af">Nama Guru</th>
+                            <th style="color: #1e40af">Mata Pelajaran</th>
+                            <th class="has-text-centered" style="color: #1e40af">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+        j.table.rows.forEach(r => {
+            let tarikh = r.c[0] ? (r.c[0].f || r.c[0].v) : "-";
+            let nama = r.c[1]?.v || "-";
+            let subjek = r.c[2]?.v || "-";
+            let link = r.c[3]?.v;
+
+            html += `
+                <tr>
+                    <td class="is-size-7">${tarikh}</td>
+                    <td class="is-size-7 has-text-weight-bold">${nama}</td>
+                    <td class="is-size-7">${subjek}</td>
+                    <td class="has-text-centered">
+                        ${link ? `<a href="${link}" target="_blank" class="button is-small is-danger is-rounded is-outlined">
+                            <i class="fas fa-file-pdf mr-2"></i> BUKA PDF</a>` 
+                        : '<span class="tag is-light">Tiada Fail</span>'}
+                    </td>
+                </tr>`;
+        });
+
+        html += `</tbody></table></div>`;
+        document.getElementById('pdfResultArea').innerHTML = html;
+    })
+    .catch(err => {
+        console.error(err);
+        document.getElementById('pdfResultArea').innerHTML = `
+            <div class="notification is-warning is-light has-text-centered">
+                Ralat memuatkan data. Sila pastikan sambungan internet stabil.
+            </div>`;
+    })
+    .finally(() => toggleLoader(false));
+}
 
         function drawDashboardStats() {
             toggleLoader(true);
