@@ -145,29 +145,32 @@
             }
         }
 
-        function showSearchMenu() {
-            // Jika mainArea telah diganti dengan iframe, kita perlu bina semula struktur Menu Carian
-            const mainArea = document.getElementById('mainArea');
-            
-            // Semak jika searchMenu masih wujud dalam DOM
-            if (!document.getElementById('searchMenu')) {
-                // Jika tidak wujud (sebab dah kena overwrite oleh loadFrame), kita reload untuk kembalikan struktur asal
-                // Kemudian set mode ke search menu selepas reload (atau bina semula innerHTML)
+       function showSearchMenu() {
+            const mainMenu = document.getElementById('mainMenu');
+            const searchMenu = document.getElementById('searchMenu');
+
+            // Jika elemen ini tidak dijumpai (sebab sedang papar borang/iframe)
+            if (!mainMenu || !searchMenu) {
+                // Simpan arahan untuk buka carian secara automatik selepas reload
+                sessionStorage.setItem('bukaCarian', 'true');
                 location.reload(); 
                 return;
             }
 
-            // Jika masih wujud, kita tukar paparan seperti biasa
+            // Jika elemen wujud (sedang berada di Laman Utama), terus tukar paparan
             document.getElementById('headerSection').style.display = 'block';
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('searchMenu').style.display = 'flex';
+            mainMenu.style.display = 'none';
+            searchMenu.style.display = 'flex';
             document.getElementById('filterPanel').style.display = 'none';
         }
 
-        function showSearchMenu() {
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('searchMenu').style.display = 'flex';
-        }
+        // Tambah kod ini di bawah fungsi-fungsi lain untuk menyambut arahan reload tadi
+        window.addEventListener('load', function() {
+            if (sessionStorage.getItem('bukaCarian') === 'true') {
+                sessionStorage.removeItem('bukaCarian');
+                showSearchMenu();
+            }
+        });
 
         // --- FUNGSI CARIAN & FILTER ---
         function prepareFilter(mode) {
