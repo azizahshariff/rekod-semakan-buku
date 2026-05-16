@@ -29,10 +29,11 @@
         .menu-item i { font-size: 2.5rem; margin-bottom: 15px; display: block; }
         .menu-item span { font-weight: 700; font-size: 0.85rem; color: #334155; text-transform: uppercase; }
 
-        #searchPanel { display: none; background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 1100px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        #searchMenu { display: none; }
+        #filterPanel { display: none; background: white; padding: 30px; border-radius: 20px; width: 100%; max-width: 800px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         iframe { width: 100%; height: 85vh; border: none; border-radius: 15px; }
         
-        .icon-isi { color: #1e40af; } .icon-semak { color: #ef4444; }
+        .icon-isi { color: #1e40af; } .icon-semak { color: #ef4444; } .icon-arkib { color: #f59e0b; }
 
         .stats-container { width: 100%; max-width: 900px; margin-bottom: 20px; }
         .chart-box { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 260px; }
@@ -68,7 +69,8 @@
         
         <div class="nav-group-title">Menu Utama</div>
         <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit mr-3"></i> Isi Laporan</div>
-        <div class="nav-link" onclick="openCombinedSearch()"><i class="fas fa-search mr-3"></i> Semak Rekod & PDF</div>
+        <div class="nav-link" onclick="showSearchMenu()"><i class="fas fa-search mr-3"></i> Semak Rekod</div>
+        <div class="nav-link" onclick="openPdfSearch()"><i class="fas fa-file-search mr-3"></i> Fail PDF</div>
     </div>
 
     <div class="main-content" id="mainArea">
@@ -87,161 +89,125 @@
 
         <div class="card-menu" id="mainMenu">
             <div class="menu-item" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-pencil-alt icon-isi"></i><span>ISI LAPORAN</span></div>
-            <div class="menu-item" onclick="openCombinedSearch()"><i class="fas fa-search-plus icon-semak"></i><span>SEMAK REKOD & PDF</span></div>
+            <div class="menu-item" onclick="showSearchMenu()"><i class="fas fa-search-plus icon-semak"></i><span>SEMAK REKOD</span></div>
+            <div class="menu-item" onclick="openPdfSearch()"><i class="fas fa-file-pdf icon-arkib"></i><span>FAIL PDF</span></div>
         </div>
 
-        <div id="searchPanel">
-            <h2 class="title is-4 has-text-link mb-5"><i class="fas fa-database mr-2"></i> CARIAN REKOD & FAIL PDF</h2>
-            <div class="columns is-multiline">
-                <div class="column is-3">
-                    <label class="label is-small">Pentadbir (Penyemak)</label>
-                    <div class="select is-fullwidth is-rounded">
-                        <select id="searchAdmin"><option value="">-- Semua Pentadbir --</option></select>
-                    </div>
-                </div>
-                <div class="column is-3">
-                    <label class="label is-small">Nama Guru (Disemak)</label>
-                    <div class="select is-fullwidth is-rounded">
-                        <select id="searchGuru"><option value="">-- Semua Guru --</option></select>
-                    </div>
-                </div>
-                <div class="column is-3">
-                    <label class="label is-small">Mata Pelajaran</label>
-                    <div class="select is-fullwidth is-rounded">
-                        <select id="searchSubjek"><option value="">-- Semua Subjek --</option></select>
-                    </div>
-                </div>
-                <div class="column is-3">
-                    <label class="label is-small">Tarikh</label>
-                    <input type="date" id="searchTarikh" class="input is-rounded">
-                </div>
+        <div class="card-menu" id="searchMenu">
+            <div class="menu-item" onclick="prepareFilter('GURU')"><i class="fas fa-user-tie has-text-link"></i><span>NAMA GURU</span></div>
+            <div class="menu-item" onclick="prepareFilter('SUBJEK')"><i class="fas fa-book has-text-success"></i><span>MATA PELAJARAN</span></div>
+            <div class="menu-item" onclick="prepareFilter('TARIKH')"><i class="fas fa-calendar-day has-text-warning"></i><span>TARIKH</span></div>
+            <div class="menu-item" onclick="drawAdminRecord()"><i class="fas fa-user-shield has-text-primary"></i><span>REKOD PENTADBIR</span></div>
+            <div style="width: 100%; text-align: center; margin-top: 20px;"><button class="button is-text is-small" onclick="location.reload()"> Kembali ke Menu Utama</button></div>
+        </div>
+
+        <div id="filterPanel">
+            <div class="columns is-vcentered">
+                <div class="column is-8" id="inputContainer"></div>
+                <div class="column is-4" id="btnSearchArea"><button class="button is-link is-fullwidth is-rounded" onclick="drawTable()">CARI DATA</button></div>
             </div>
-            <div class="has-text-centered mt-4">
-                <button class="button is-link is-rounded px-6" onclick="executeSearch()">
-                    <i class="fas fa-search mr-2"></i> JANA REKOD
-                </button>
-                <button class="button is-text is-small ml-3" onclick="location.reload()">Batal</button>
-            </div>
-            <hr>
-            <div id="resultsArea">
-                <div class="has-text-centered py-6">
-                    <i class="fas fa-filter fa-2x has-text-grey-lighter mb-3"></i>
-                    <p class="has-text-grey">Sila masukkan kriteria dan klik Jana Rekod.</p>
-                </div>
-            </div>
+            <div id="resultsTable" class="mt-5"></div>
         </div>
     </div>
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbyJkmYgJXzojMmEgVHuh-aR8GkegycSjAP-Avn_Xw7H0kr13IbVUTiUmNH6Fx-imLMf0A/exec';
         const sheetID = '1T7GcIbxlqQiaBcjE7LaKAUzANhzzGtS--_xDyKXizCg';
+        let currentMode = '';
 
-        google.charts.load('current', {'packages':['corechart', 'table']});
+        google.charts.load('current', {'packages':['corechart', 'table', 'bar']});
         google.charts.setOnLoadCallback(drawDashboardStats);
 
         function toggleLoader(show) {
             document.getElementById('loader-overlay').style.display = show ? 'flex' : 'none';
         }
 
-        // --- FUNGSI CARIAN GABUNGAN (GURU + PENTADBIR + SUBJEK + TARIKH) ---
-        function openCombinedSearch() {
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('statsSection').style.display = 'none';
-            document.getElementById('searchPanel').style.display = 'block';
-            
-            toggleLoader(true);
-            // Ambil senarai unik untuk dropdown (Guru, Subjek, Pentadbir)
+        function openPdfSearch() {
+            const mainArea = document.getElementById('mainArea');
+            mainArea.innerHTML = `
+                <div style="width:100%; max-width:1000px;">
+                    <button class="button is-small is-light mb-4" onclick="location.reload()">← Kembali</button>
+                    <div class="box" style="border-radius: 20px; padding: 30px;">
+                        <h2 class="title is-4 has-text-link"><i class="fas fa-file-pdf mr-2"></i> CARIAN FAIL PDF LAPORAN</h2>
+                        <div class="columns is-multiline">
+                            <div class="column is-4">
+                                <label class="label is-small">Nama Guru</label>
+                                <div class="select is-fullwidth is-rounded">
+                                    <select id="pdfGuru"><option value="">-- Semua Guru --</option></select>
+                                </div>
+                            </div>
+                            <div class="column is-4">
+                                <label class="label is-small">Mata Pelajaran</label>
+                                <div class="select is-fullwidth is-rounded">
+                                    <select id="pdfSubjek"><option value="">-- Semua Subjek --</option></select>
+                                </div>
+                            </div>
+                            <div class="column is-4">
+                                <label class="label is-small">Tarikh</label>
+                                <input type="date" id="pdfTarikh" class="input is-rounded">
+                            </div>
+                        </div>
+                        <div class="has-text-centered mt-4">
+                            <button class="button is-link is-rounded px-6" onclick="drawPdfTable()">
+                                <i class="fas fa-search mr-2"></i> CARI REKOD
+                            </button>
+                        </div>
+                        <hr>
+                        <div id="pdfResultArea" style="min-height: 200px;">
+                            <div class="has-text-centered py-6">
+                                <i class="fas fa-filter fa-3x has-text-grey-lighter mb-3"></i>
+                                <p class="has-text-grey">Sila pilih kriteria dan klik Cari</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
             fetch(scriptURL + "?getLists=true").then(r => r.json()).then(d => {
-                const sAdmin = document.getElementById('searchAdmin');
-                const sGuru = document.getElementById('searchGuru');
-                const sSubjek = document.getElementById('searchSubjek');
-                
-                sAdmin.innerHTML = '<option value="">-- Semua Pentadbir --</option>';
-                sGuru.innerHTML = '<option value="">-- Semua Guru --</option>';
-                sSubjek.innerHTML = '<option value="">-- Semua Subjek --</option>';
-                
-                // Nota: Pastikan backend GS anda menghantar data pentadbir juga, jika tidak, kita gunakan data sedia ada
-                if(d.admins) d.admins.forEach(a => { sAdmin.innerHTML += `<option value="${a}">${a}</option>`; });
+                const sGuru = document.getElementById('pdfGuru');
+                const sSubjek = document.getElementById('pdfSubjek');
                 d.guru.forEach(g => { sGuru.innerHTML += `<option value="${g}">${g}</option>`; });
                 d.subjek.forEach(s => { sSubjek.innerHTML += `<option value="${s}">${s}</option>`; });
-            }).finally(() => toggleLoader(false));
+            });
         }
 
-        function executeSearch() {
-            const admin = document.getElementById('searchAdmin').value;
-            const guru = document.getElementById('searchGuru').value;
-            const subjek = document.getElementById('searchSubjek').value;
-            const tarikhRaw = document.getElementById('searchTarikh').value;
-            
+        function drawPdfTable() {
+            const guru = document.getElementById('pdfGuru').value;
+            const subjek = document.getElementById('pdfSubjek').value;
+            const tarikhRaw = document.getElementById('pdfTarikh').value;
             toggleLoader(true);
-
             let conditions = [];
-            if (admin) conditions.push(`S = '${admin}'`); // Kolum S: Nama Pentadbir
-            if (guru) conditions.push(`C = '${guru}'`);   // Kolum C: Nama Guru
-            if (subjek) conditions.push(`F = '${subjek}'`); // Kolum F: Subjek
+            if (guru) conditions.push(`C = '${guru}'`);
+            if (subjek) conditions.push(`F = '${subjek}'`);
             if (tarikhRaw) {
                 const d = tarikhRaw.split('-');
                 const formattedDate = `${d[2]}/${d[1]}/${d[0]}`;
-                conditions.push(`B = '${formattedDate}'`); // Kolum B: Tarikh
+                conditions.push(`B = '${formattedDate}'`);
             }
-
             let whereClause = conditions.length > 0 ? "WHERE " + conditions.join(" AND ") : "";
-            // Query: S(Pentadbir), B(Tarikh), C(Guru), F(Subjek), Q(Skala), U(Link PDF)
-            let q = encodeURIComponent(`SELECT S, B, C, F, Q, U ${whereClause} ORDER BY B DESC`);
+            let q = encodeURIComponent(`SELECT B, C, F, U ${whereClause} ORDER BY B DESC`);
             let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
-
             fetch(url).then(r => r.text()).then(t => {
                 let j = JSON.parse(t.substr(47).slice(0,-2));
-                
                 if (j.table.rows.length === 0) {
-                    document.getElementById('resultsArea').innerHTML = `<div class="notification is-light has-text-centered">Tiada data ditemui.</div>`;
+                    document.getElementById('pdfResultArea').innerHTML = `<div class="notification is-warning is-light has-text-centered">Tiada rekod dijumpai.</div>`;
                     return;
                 }
-
-                let html = `
-                    <div class="table-container">
-                        <table class="table is-fullwidth is-hoverable is-narrow is-striped">
-                            <thead>
-                                <tr style="background: #1e3a8a">
-                                    <th style="color:white">Pentadbir</th>
-                                    <th style="color:white">Tarikh</th>
-                                    <th style="color:white">Guru Disemak</th>
-                                    <th style="color:white">Subjek</th>
-                                    <th style="color:white" class="has-text-centered">Skala</th>
-                                    <th style="color:white" class="has-text-centered">Fail</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
-
+                let html = `<div class="table-container"><table class="table is-fullwidth is-hoverable is-striped"><thead><tr style="background: #eff6ff"><th style="color: #1e40af">Tarikh</th><th style="color: #1e40af">Nama Guru</th><th style="color: #1e40af">Mata Pelajaran</th><th class="has-text-centered" style="color: #1e40af">Tindakan</th></tr></thead><tbody>`;
                 j.table.rows.forEach(r => {
-                    let pdt = r.c[0]?.v || "-";
-                    let tarikh = r.c[1] ? (r.c[1].f || r.c[1].v) : "-";
-                    let nama = r.c[2]?.v || "-";
-                    let sub = r.c[3]?.v || "-";
-                    let skala = r.c[4]?.v || "-";
-                    let link = r.c[5]?.v;
-
-                    html += `
-                        <tr>
-                            <td class="is-size-7 has-text-weight-semibold">${pdt}</td>
-                            <td class="is-size-7">${tarikh}</td>
-                            <td class="is-size-7">${nama}</td>
-                            <td class="is-size-7">${sub}</td>
-                            <td class="is-size-7 has-text-centered"><span class="tag is-info is-light">${skala}</span></td>
-                            <td class="has-text-centered">
-                                ${link ? `<a href="${link}" target="_blank" class="button is-extra-small is-danger is-outlined"><i class="fas fa-file-pdf"></i></a>` : '-'}
-                            </td>
-                        </tr>`;
+                    let tarikh = r.c[0] ? (r.c[0].f || r.c[0].v) : "-";
+                    let nama = r.c[1]?.v || "-";
+                    let subjek = r.c[2]?.v || "-";
+                    let link = r.c[3]?.v;
+                    html += `<tr><td class="is-size-7">${tarikh}</td><td class="is-size-7 has-text-weight-bold">${nama}</td><td class="is-size-7">${subjek}</td><td class="has-text-centered">${link ? `<a href="${link}" target="_blank" class="button is-small is-danger is-outlined is-rounded"><i class="fas fa-file-pdf mr-2"></i> BUKA PDF</a>` : '<span class="tag is-light">Tiada Fail</span>'}</td></tr>`;
                 });
-
                 html += `</tbody></table></div>`;
-                document.getElementById('resultsArea').innerHTML = html;
-            })
-            .catch(() => { document.getElementById('resultsArea').innerHTML = 'Ralat sistem.'; })
-            .finally(() => toggleLoader(false));
+                document.getElementById('pdfResultArea').innerHTML = html;
+            }).catch(() => {
+                document.getElementById('pdfResultArea').innerHTML = '<p class="has-text-danger">Ralat memuatkan data.</p>';
+            }).finally(() => toggleLoader(false));
         }
 
-        // --- DASHBOARD ---
         function drawDashboardStats() {
             toggleLoader(true);
             const qM = encodeURIComponent("SELECT B, COUNT(C) GROUP BY B ORDER BY B DESC LIMIT 7");
@@ -257,19 +223,79 @@
                 d1.addColumn('string', 'Tarikh'); d1.addColumn('number', 'Rekod');
                 j1.table.rows.forEach(r => d1.addRow([r.c[0] ? (r.c[0].f || r.c[0].v) : "", r.c[1].v]));
                 new google.visualization.ColumnChart(document.getElementById('chartMinggu')).draw(d1, { colors: ['#1e3a8a'], legend: 'none', chartArea: {width: '80%', height: '70%'} });
-
                 let j2 = JSON.parse(texts[1].substr(47).slice(0,-2));
                 let d2 = new google.visualization.DataTable();
                 d2.addColumn('string', 'Subjek'); d2.addColumn('number', 'Jumlah');
                 j2.table.rows.forEach(r => d2.addRow([r.c[0].v, r.c[1].v]));
                 new google.visualization.PieChart(document.getElementById('chartSubjek')).draw(d2, { pieHole: 0.4, colors: ['#1e3a8a', '#ef4444', '#f59e0b', '#10b981', '#6366f1'], chartArea: {width: '100%', height: '80%'}, legend: {position: 'bottom', textStyle: {fontSize: 10}} });
-            })
-            .finally(() => toggleLoader(false));
+            }).finally(() => toggleLoader(false));
+        }
+
+        function drawTable() {
+            const val = document.getElementById('fVal').value;
+            if(!val) return alert("Sila pilih kriteria carian");
+            toggleLoader(true);
+            let q = (currentMode==='GURU') ? `SELECT B, C, F, Q, U WHERE C = '${val}'` : (currentMode==='SUBJEK') ? `SELECT B, C, F, Q, U WHERE F = '${val}'` : `SELECT B, C, F, Q, U WHERE B = '${val.split('-').reverse().join('/')}'`;
+            fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(q)}&sheet=rekod_semakan`)
+            .then(r => r.text()).then(t => {
+                let j = JSON.parse(t.substr(47).slice(0,-2));
+                let dt = new google.visualization.DataTable();
+                dt.addColumn('string', 'Tarikh'); dt.addColumn('string', 'Guru'); dt.addColumn('string', 'Subjek'); dt.addColumn('string', 'Skala'); dt.addColumn('string', 'PDF');
+                dt.addRows(j.table.rows.map(r => [r.c[0] ? (r.c[0].f || r.c[0].v) : "", r.c[1]?.v, r.c[2]?.v, r.c[3]?.v, r.c[4] ? `<a href="${r.c[4].v}" target="_blank" class="button is-small is-link is-outlined">LIHAT PDF</a>` : "Tiada"]));
+                new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml:true, width:'100%', pageSize: 10});
+            }).finally(() => toggleLoader(false));
+        }
+
+        function drawAdminRecord() {
+            toggleLoader(true);
+            document.getElementById('filterPanel').style.display = 'block';
+            document.getElementById('btnSearchArea').style.display = 'none';
+            document.getElementById('inputContainer').innerHTML = '<strong>Ringkasan Aktiviti Pentadbir</strong>';
+            let q = encodeURIComponent(`SELECT S, T, B, C, F, U ORDER BY B DESC`);
+            fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`)
+            .then(r => r.text()).then(t => {
+                let j = JSON.parse(t.substr(47).slice(0,-2));
+                let dt = new google.visualization.DataTable();
+                dt.addColumn('string', 'Pentadbir'); dt.addColumn('string', 'Jawatan'); dt.addColumn('string', 'Tarikh'); dt.addColumn('string', 'Guru'); dt.addColumn('string', 'Subjek'); dt.addColumn('string', 'Fail');
+                dt.addRows(j.table.rows.map(r => [r.c[0]?.v, r.c[1]?.v, r.c[2] ? (r.c[2].f || r.c[2].v) : "", r.c[3]?.v, r.c[4]?.v, r.c[5] ? `<a href="${r.c[5].v}" target="_blank" class="button is-small is-danger is-outlined">PDF</a>` : "Tiada"]));
+                new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml:true, width:'100%', pageSize: 15});
+            }).finally(() => toggleLoader(false));
         }
 
         function loadFrame(url) {
             const mainArea = document.getElementById('mainArea');
             mainArea.innerHTML = `<div style="width:100%"><button class="button is-small is-light mb-2" onclick="location.reload()">← Kembali</button><iframe src="${url}"></iframe></div>`;
+        }
+
+        function showSearchMenu() {
+            const mainMenu = document.getElementById('mainMenu'), searchMenu = document.getElementById('searchMenu'), statsSection = document.getElementById('statsSection');
+            if (!mainMenu || !searchMenu) { sessionStorage.setItem('bukaCarian', 'true'); location.reload(); return; }
+            document.getElementById('headerSection').style.display = 'block';
+            if (statsSection) statsSection.style.display = 'none';
+            mainMenu.style.display = 'none'; searchMenu.style.display = 'flex';
+            document.getElementById('filterPanel').style.display = 'none';
+        }
+
+        window.addEventListener('load', function() {
+            if (sessionStorage.getItem('bukaCarian') === 'true') { sessionStorage.removeItem('bukaCarian'); showSearchMenu(); }
+        });
+
+        function prepareFilter(mode) {
+            currentMode = mode;
+            document.getElementById('filterPanel').style.display = 'block';
+            const container = document.getElementById('inputContainer');
+            container.innerHTML = '<p class="is-size-7">Memuatkan data...</p>';
+            fetch(scriptURL + "?getLists=true").then(r => r.json()).then(d => {
+                if (mode === 'GURU') {
+                    let opts = d.guru.map(g => `<option value="${g}">${g}</option>`).join('');
+                    container.innerHTML = `<label class="label is-small">Nama Guru</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Nama --</option>${opts}</select></div>`;
+                } else if (mode === 'SUBJEK') {
+                    let opts = d.subjek.map(s => `<option value="${s}">${s}</option>`).join('');
+                    container.innerHTML = `<label class="label is-small">Mata Pelajaran</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Subjek --</option>${opts}</select></div>`;
+                } else if (mode === 'TARIKH') {
+                    container.innerHTML = `<label class="label is-small">Tarikh</label><input type="date" id="fVal" class="input">`;
+                }
+            });
         }
     </script>
 </body>
