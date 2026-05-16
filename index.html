@@ -21,7 +21,7 @@
         .nav-group-title { padding: 15px 25px 5px; font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
 
         .main-content { flex-grow: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; align-items: center; }
-        .header-section { text-align: center; margin-bottom: 40px; }
+        .header-section { text-align: center; margin-bottom: 30px; }
         
         .card-menu { display: flex; justify-content: center; gap: 20px; width: 100%; max-width: 900px; flex-wrap: wrap; }
         .menu-item { background: white; border-radius: 18px; padding: 40px 20px; text-align: center; cursor: pointer; transition: 0.3s; width: 220px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
@@ -34,6 +34,10 @@
         iframe { width: 100%; height: 85vh; border: none; border-radius: 15px; }
         
         .icon-isi { color: #1e40af; } .icon-semak { color: #ef4444; } .icon-arkib { color: #f59e0b; }
+
+        /* Gaya Khas Statistik */
+        .stats-container { width: 100%; max-width: 900px; margin-bottom: 20px; }
+        .chart-box { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: 260px; }
     </style>
 </head>
 <body>
@@ -58,6 +62,23 @@
             <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" width="70">
             <h1 class="title is-3" style="color: var(--primary); margin-top: 10px;">PENGURUSAN UNIT KURIKULUM</h1>
             <p class="subtitle is-6 has-text-grey">SK Simpang Rengam • Rekod Semakan Buku Murid</p>
+        </div>
+
+        <div id="statsSection" class="stats-container">
+            <div class="columns is-multiline">
+                <div class="column is-6">
+                    <div class="chart-box">
+                        <p class="is-size-7 has-text-weight-bold has-text-centered mb-2">BILANGAN SEMAKAN (7 HARI TERAKHIR)</p>
+                        <div id="chartMinggu" style="width:100%; height:200px;"></div>
+                    </div>
+                </div>
+                <div class="column is-6">
+                    <div class="chart-box">
+                        <p class="is-size-7 has-text-weight-bold has-text-centered mb-2">AGIHAN MENGIKUT SUBJEK</p>
+                        <div id="chartSubjek" style="width:100%; height:200px;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="card-menu" id="mainMenu">
@@ -102,69 +123,78 @@
     </div>
 
     <script>
-        // --- KONFIGURASI ---
         const scriptURL = 'https://script.google.com/macros/s/AKfycbyJkmYgJXzojMmEgVHuh-aR8GkegycSjAP-Avn_Xw7H0kr13IbVUTiUmNH6Fx-imLMf0A/exec';
         const sheetID = '1T7GcIbxlqQiaBcjE7LaKAUzANhzzGtS--_xDyKXizCg';
         let currentMode = '';
 
-        // --- FUNGSI NAVIGASI (DIBAIKI) ---
+        // --- TAMBAHAN: LOAD GOOGLE CHARTS UNTUK GRAFIK ---
+        google.charts.load('current', {'packages':['corechart', 'table', 'bar']});
+        google.charts.setOnLoadCallback(drawDashboardStats);
+
+        function drawDashboardStats() {
+            // 1. Grafik Mingguan (Column Chart)
+            let qMinggu = encodeURIComponent("SELECT B, COUNT(C) GROUP BY B ORDER BY B DESC LIMIT 7");
+            let urlMinggu = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${qMinggu}&sheet=rekod_semakan`;
+
+            fetch(urlMinggu).then(r => r.text()).then(t => {
+                let j = JSON.parse(t.substr(47).slice(0,-2));
+                let data = new google.visualization.DataTable();
+                data.addColumn('string', 'Tarikh');
+                data.addColumn('number', 'Rekod');
+                j.table.rows.forEach(r => data.addRow([r.c[0] ? (r.c[0].f || r.c[0].v) : "", r.c[1].v]));
+
+                new google.visualization.ColumnChart(document.getElementById('chartMinggu')).draw(data, {
+                    colors: ['#1e3a8a'], legend: {position: 'none'},
+                    vAxis: {minValue: 0, gridlines: {count: 4}},
+                    chartArea: {width: '80%', height: '70%'}
+                });
+            });
+
+            // 2. Grafik Subjek (Pie Chart)
+            let qSubjek = encodeURIComponent("SELECT F, COUNT(C) GROUP BY F");
+            let urlSubjek = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${qSubjek}&sheet=rekod_semakan`;
+
+            fetch(urlSubjek).then(r => r.text()).then(t => {
+                let j = JSON.parse(t.substr(47).slice(0,-2));
+                let data = new google.visualization.DataTable();
+                data.addColumn('string', 'Subjek');
+                data.addColumn('number', 'Jumlah');
+                j.table.rows.forEach(r => data.addRow([r.c[0].v, r.c[1].v]));
+
+                new google.visualization.PieChart(document.getElementById('chartSubjek')).draw(data, {
+                    pieHole: 0.4, colors: ['#1e3a8a', '#ef4444', '#f59e0b', '#10b981', '#6366f1'],
+                    chartArea: {width: '100%', height: '80%'},
+                    legend: {position: 'bottom', textStyle: {fontSize: 10}}
+                });
+            });
+        }
+
+        // --- FUNGSI NAVIGASI ---
         function loadFrame(url) {
             const mainArea = document.getElementById('mainArea');
-            
-            // Jika URL adalah Arkib Google Drive
             if (url.includes('drive.google.com')) {
-                mainArea.innerHTML = `
-                    <div style="width:100%; max-width:1000px;">
-                        <div class="level mb-4">
-                            <div class="level-left">
-                                <button class="button is-small is-light" onclick="location.reload()">← Kembali</button>
-                            </div>
-                            <div class="level-item">
-                                <h2 class="title is-4 has-text-link"><i class="fas fa-archive mr-2"></i> ARKIB LAPORAN PDF</h2>
-                            </div>
-                        </div>
-                        
-                        <div class="box" style="padding: 0; overflow: hidden; border-radius: 15px; border: 2px solid #e2e8f0;">
-                            <div style="background: #1e3a8a; color: white; padding: 10px 20px; font-size: 0.8rem;">
-                                <i class="fas fa-folder-open mr-2"></i> Folder: Laporan Semakan Buku Murid (Google Drive)
-                            </div>
-                            <iframe src="${url}" style="width:100%; height:75vh; border:none;"></iframe>
-                        </div>
-                        
-                        <p class="has-text-centered is-size-7 has-text-grey mt-3">
-                            *Gunakan butang 'Pop-out' di atas kanan folder jika paparan Drive tidak muncul sempurna.
-                        </p>
-                    </div>`;
+                mainArea.innerHTML = `<div style="width:100%; max-width:1000px;"><div class="level mb-4"><div class="level-left"><button class="button is-small is-light" onclick="location.reload()">← Kembali</button></div><div class="level-item"><h2 class="title is-4 has-text-link"><i class="fas fa-archive mr-2"></i> ARKIB LAPORAN PDF</h2></div></div><div class="box" style="padding: 0; overflow: hidden; border-radius: 15px; border: 2px solid #e2e8f0;"><div style="background: #1e3a8a; color: white; padding: 10px 20px; font-size: 0.8rem;"><i class="fas fa-folder-open mr-2"></i> Folder: Laporan PDF</div><iframe src="${url}" style="width:100%; height:75vh; border:none;"></iframe></div></div>`;
             } else {
-                // Untuk borang biasa (Isi Laporan)
-                mainArea.innerHTML = `
-                    <div style="width:100%">
-                        <button class="button is-small is-light mb-2" onclick="location.reload()">← Kembali</button>
-                        <iframe src="${url}"></iframe>
-                    </div>`;
+                mainArea.innerHTML = `<div style="width:100%"><button class="button is-small is-light mb-2" onclick="location.reload()">← Kembali</button><iframe src="${url}"></iframe></div>`;
             }
         }
 
        function showSearchMenu() {
             const mainMenu = document.getElementById('mainMenu');
             const searchMenu = document.getElementById('searchMenu');
+            const statsSection = document.getElementById('statsSection');
 
-            // Jika elemen ini tidak dijumpai (sebab sedang papar borang/iframe)
             if (!mainMenu || !searchMenu) {
-                // Simpan arahan untuk buka carian secara automatik selepas reload
                 sessionStorage.setItem('bukaCarian', 'true');
-                location.reload(); 
-                return;
+                location.reload(); return;
             }
-
-            // Jika elemen wujud (sedang berada di Laman Utama), terus tukar paparan
             document.getElementById('headerSection').style.display = 'block';
+            if (statsSection) statsSection.style.display = 'none'; // Sembunyi graf bila masuk menu carian
             mainMenu.style.display = 'none';
             searchMenu.style.display = 'flex';
             document.getElementById('filterPanel').style.display = 'none';
         }
 
-        // Tambah kod ini di bawah fungsi-fungsi lain untuk menyambut arahan reload tadi
         window.addEventListener('load', function() {
             if (sessionStorage.getItem('bukaCarian') === 'true') {
                 sessionStorage.removeItem('bukaCarian');
@@ -172,101 +202,49 @@
             }
         });
 
-        // --- FUNGSI CARIAN & FILTER ---
         function prepareFilter(mode) {
             currentMode = mode;
             document.getElementById('filterPanel').style.display = 'block';
-            document.getElementById('btnSearchArea').style.display = 'block';
             const container = document.getElementById('inputContainer');
-            container.innerHTML = '<p class="is-size-7">Memuatkan data dari sheet tetapan...</p>';
-
-            // Panggilan API ke Kod.gs untuk ambil senarai dropdown
-            fetch(scriptURL + "?getLists=true")
-                .then(r => r.json())
-                .then(d => {
-                    if (mode === 'GURU') {
-                        let opts = d.guru.map(g => `<option value="${g}">${g}</option>`).join('');
-                        container.innerHTML = `<label class="label is-small">Nama Guru</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Nama --</option>${opts}</select></div>`;
-                    } 
-                    else if (mode === 'SUBJEK') {
-                        let opts = d.subjek.map(s => `<option value="${s}">${s}</option>`).join('');
-                        container.innerHTML = `<label class="label is-small">Mata Pelajaran</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Subjek --</option>${opts}</select></div>`;
-                    }
-                    else if (mode === 'TARIKH') {
-                        container.innerHTML = `<label class="label is-small">Tarikh</label><input type="date" id="fVal" class="input">`;
-                    }
-                })
-                .catch(err => {
-                    container.innerHTML = '<p class="has-text-danger">Ralat memuatkan data. Sila pastikan URL Web App betul.</p>';
-                });
+            container.innerHTML = '<p class="is-size-7">Memuatkan data...</p>';
+            fetch(scriptURL + "?getLists=true").then(r => r.json()).then(d => {
+                if (mode === 'GURU') {
+                    let opts = d.guru.map(g => `<option value="${g}">${g}</option>`).join('');
+                    container.innerHTML = `<label class="label is-small">Nama Guru</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Nama --</option>${opts}</select></div>`;
+                } else if (mode === 'SUBJEK') {
+                    let opts = d.subjek.map(s => `<option value="${s}">${s}</option>`).join('');
+                    container.innerHTML = `<label class="label is-small">Mata Pelajaran</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Subjek --</option>${opts}</select></div>`;
+                } else if (mode === 'TARIKH') {
+                    container.innerHTML = `<label class="label is-small">Tarikh</label><input type="date" id="fVal" class="input">`;
+                }
+            });
         }
 
-        google.charts.load('current', {'packages':['table']});
-
-        // --- FUNGSI PAPAR JADUAL (USER) ---
         function drawTable() {
             const val = document.getElementById('fVal').value;
             if(!val) return alert("Sila pilih kriteria carian");
-
-            let q = "";
-            if(currentMode==='GURU') q = `SELECT B, C, F, Q, U WHERE C = '${val}'`;
-            if(currentMode==='SUBJEK') q = `SELECT B, C, F, Q, U WHERE F = '${val}'`;
-            if(currentMode==='TARIKH') { 
-                let d = val.split('-'); 
-                q = `SELECT B, C, F, Q, U WHERE B = '${d[2]}/${d[1]}/${d[0]}'`; 
-            }
-
+            let q = (currentMode==='GURU') ? `SELECT B, C, F, Q, U WHERE C = '${val}'` : (currentMode==='SUBJEK') ? `SELECT B, C, F, Q, U WHERE F = '${val}'` : `SELECT B, C, F, Q, U WHERE B = '${val.split('-').reverse().join('/')}'`;
             let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(q)}&sheet=rekod_semakan`;
-
             fetch(url).then(r => r.text()).then(t => {
                 let j = JSON.parse(t.substr(47).slice(0,-2));
                 let dt = new google.visualization.DataTable();
-                dt.addColumn('string', 'Tarikh'); 
-                dt.addColumn('string', 'Guru'); 
-                dt.addColumn('string', 'Subjek'); 
-                dt.addColumn('string', 'Skala'); 
-                dt.addColumn('string', 'PDF');
-                
-                dt.addRows(j.table.rows.map(r => [
-                    r.c[0] ? (r.c[0].f || r.c[0].v) : "", 
-                    r.c[1] ? r.c[1].v : "", 
-                    r.c[2] ? r.c[2].v : "", 
-                    r.c[3] ? r.c[3].v : "", 
-                    r.c[4] ? `<a href="${r.c[4].v}" target="_blank" class="button is-small is-link is-outlined">LIHAT PDF</a>` : "Tiada"
-                ]));
-                
+                dt.addColumn('string', 'Tarikh'); dt.addColumn('string', 'Guru'); dt.addColumn('string', 'Subjek'); dt.addColumn('string', 'Skala'); dt.addColumn('string', 'PDF');
+                dt.addRows(j.table.rows.map(r => [r.c[0] ? (r.c[0].f || r.c[0].v) : "", r.c[1]?.v, r.c[2]?.v, r.c[3]?.v, r.c[4] ? `<a href="${r.c[4].v}" target="_blank" class="button is-small is-link is-outlined">LIHAT PDF</a>` : "Tiada"]));
                 new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml:true, width:'100%', pageSize: 10});
             });
         }
 
-        // --- FUNGSI PAPAR JADUAL (PENTADBIR) ---
         function drawAdminRecord() {
             document.getElementById('filterPanel').style.display = 'block';
             document.getElementById('btnSearchArea').style.display = 'none';
-            document.getElementById('inputContainer').innerHTML = '<strong>Ringkasan Aktiviti Pentadbir (Semua Rekod)</strong>';
-            
+            document.getElementById('inputContainer').innerHTML = '<strong>Ringkasan Aktiviti Pentadbir</strong>';
             let q = encodeURIComponent(`SELECT S, T, B, C, F, U ORDER BY B DESC`);
             let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
-
             fetch(url).then(r => r.text()).then(t => {
                 let j = JSON.parse(t.substr(47).slice(0,-2));
                 let dt = new google.visualization.DataTable();
-                dt.addColumn('string', 'Pentadbir'); 
-                dt.addColumn('string', 'Jawatan'); 
-                dt.addColumn('string', 'Tarikh'); 
-                dt.addColumn('string', 'Guru Disemak'); 
-                dt.addColumn('string', 'Subjek');
-                dt.addColumn('string', 'Fail');
-
-                dt.addRows(j.table.rows.map(r => [
-                    r.c[0] ? r.c[0].v : "", 
-                    r.c[1] ? r.c[1].v : "", 
-                    r.c[2] ? (r.c[2].f || r.c[2].v) : "", 
-                    r.c[3] ? r.c[3].v : "", 
-                    r.c[4] ? r.c[4].v : "",
-                    r.c[5] ? `<a href="${r.c[5].v}" target="_blank" class="button is-small is-danger is-outlined">PDF</a>` : "Tiada"
-                ]));
-
+                dt.addColumn('string', 'Pentadbir'); dt.addColumn('string', 'Jawatan'); dt.addColumn('string', 'Tarikh'); dt.addColumn('string', 'Guru'); dt.addColumn('string', 'Subjek'); dt.addColumn('string', 'Fail');
+                dt.addRows(j.table.rows.map(r => [r.c[0]?.v, r.c[1]?.v, r.c[2] ? (r.c[2].f || r.c[2].v) : "", r.c[3]?.v, r.c[4]?.v, r.c[5] ? `<a href="${r.c[5].v}" target="_blank" class="button is-small is-danger is-outlined">PDF</a>` : "Tiada"]));
                 new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml:true, width:'100%', pageSize: 15});
             });
         }
