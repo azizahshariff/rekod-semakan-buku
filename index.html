@@ -51,7 +51,6 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Style Tambahan untuk Kad Pentadbir */
         .admin-card { background: #ffffff; border: 1px solid #edf2f7; border-radius: 12px; padding: 15px; height: 100%; transition: 0.2s; position: relative; }
         .admin-card:hover { border-color: #1e3a8a; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .admin-badge { position: absolute; top: 10px; right: 10px; background: #eff6ff; color: #1e40af; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
@@ -74,7 +73,7 @@
         
         <div class="nav-group-title">Menu Utama</div>
         <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit mr-3"></i> Isi Laporan</div>
-        <div class="nav-link" onclick="showSearchMenu()"><i class="fas fa-search mr-3"></i> Semak Rekod</div>
+        <div class="nav-link" onclick="triggerSearchMenu()"><i class="fas fa-search mr-3"></i> Semak Rekod</div>
         <div class="nav-link" onclick="openPdfSearch()"><i class="fas fa-file-search mr-3"></i> Fail PDF</div>
     </div>
 
@@ -124,106 +123,82 @@
             document.getElementById('loader-overlay').style.display = show ? 'flex' : 'none';
         }
 
-        // --- FUNGSI REKOD PENTADBIR (DENGAN IKON DINAMIK) ---
+        // 2. TAMBAH FUNGSI TRIGGERSEARCHMENU
+        function triggerSearchMenu() {
+            const mainArea = document.getElementById('mainArea');
+            if (!document.getElementById('mainMenu')) {
+                mainArea.innerHTML = `
+                    <div id="headerSection" class="header-section">
+                        <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" width="70">
+                        <h1 class="title is-3" style="color: var(--primary); margin-top: 10px;">PENGURUSAN UNIT KURIKULUM</h1>
+                        <p class="subtitle is-6 has-text-grey">SK Simpang Rengam • Rekod Semakan Buku Murid</p>
+                    </div>
+                    <div id="statsSection" class="stats-container" style="display:none;">
+                        <div class="columns is-multiline">
+                            <div class="column is-6"><div class="chart-box"><p id="titleWeek" class="is-size-7 has-text-weight-bold has-text-centered mb-2">BILANGAN SEMAKAN (7 HARI TERAKHIR)</p><div id="chartMinggu" style="width:100%; height:200px;"></div></div></div>
+                            <div class="column is-6"><div class="chart-box"><p id="titleSub" class="is-size-7 has-text-weight-bold has-text-centered mb-2">AGIHAN MENGIKUT SUBJEK</p><div id="chartSubjek" style="width:100%; height:200px;"></div></div></div>
+                        </div>
+                    </div>
+                    <div class="card-menu" id="mainMenu" style="display:none;"></div>
+                    <div class="card-menu" id="searchMenu" style="display:flex;">
+                        <div class="menu-item" onclick="prepareFilter('GURU')"><i class="fas fa-user-tie has-text-link"></i><span>NAMA GURU</span></div>
+                        <div class="menu-item" onclick="prepareFilter('SUBJEK')"><i class="fas fa-book has-text-success"></i><span>MATA PELAJARAN</span></div>
+                        <div class="menu-item" onclick="prepareFilter('TARIKH')"><i class="fas fa-calendar-day has-text-warning"></i><span>TARIKH</span></div>
+                        <div class="menu-item" onclick="drawAdminRecord()"><i class="fas fa-user-shield has-text-primary"></i><span>REKOD PENTADBIR</span></div>
+                        <div style="width: 100%; text-align: center; margin-top: 20px;"><button class="button is-text is-small" onclick="location.reload()"> Kembali ke Menu Utama</button></div>
+                    </div>
+                    <div id="filterPanel">
+                        <div id="inputContainer"></div>
+                        <div id="resultsTable" class="mt-5"></div>
+                    </div>
+                `;
+            } else {
+                showSearchMenu();
+            }
+        }
+
         function drawAdminRecord() {
             const filterPanel = document.getElementById('filterPanel');
             const inputContainer = document.getElementById('inputContainer');
             const resultsTable = document.getElementById('resultsTable');
-            
             filterPanel.style.display = 'block';
             resultsTable.innerHTML = ""; 
-
             inputContainer.innerHTML = `
-                <div class="notification is-link is-light mb-5 has-text-centered">
-                    <p class="is-size-7"><strong>SILA PILIH PENTADBIR UNTUK MELIHAT REKOD SEMAKAN</strong></p>
-                </div>
+                <div class="notification is-link is-light mb-5 has-text-centered"><p class="is-size-7"><strong>SILA PILIH PENTADBIR</strong></p></div>
                 <div class="columns is-mobile is-multiline is-centered">
-                    <div class="column is-2-desktop is-4-mobile has-text-centered">
-                        <button class="button is-white is-flex-direction-column" onclick="fetchAdminData('Guru Besar')" style="height: auto; padding: 15px;">
-                            <i class="fas fa-user-tie fa-2x has-text-info"></i><span class="is-size-7 mt-2">GB</span>
-                        </button>
-                    </div>
-                    <div class="column is-2-desktop is-4-mobile has-text-centered">
-                        <button class="button is-white is-flex-direction-column" onclick="fetchAdminData('GPK Kurikulum')" style="height: auto; padding: 15px;">
-                            <i class="fas fa-user-graduate fa-2x has-text-success"></i><span class="is-size-7 mt-2">GPK KURI</span>
-                        </button>
-                    </div>
-                    <div class="column is-2-desktop is-4-mobile has-text-centered">
-                        <button class="button is-white is-flex-direction-column" onclick="fetchAdminData('GPK HEM')" style="height: auto; padding: 15px;">
-                            <i class="fas fa-users-cog fa-2x has-text-warning"></i><span class="is-size-7 mt-2">GPK HEM</span>
-                        </button>
-                    </div>
-                    <div class="column is-2-desktop is-4-mobile has-text-centered">
-                        <button class="button is-white is-flex-direction-column" onclick="fetchAdminData('GPK Kokurikulum')" style="height: auto; padding: 15px;">
-                            <i class="fas fa-trophy fa-2x has-text-danger"></i><span class="is-size-7 mt-2">GPK KOKO</span>
-                        </button>
-                    </div>
-                    <div class="column is-2-desktop is-4-mobile has-text-centered">
-                        <button class="button is-white is-flex-direction-column" onclick="fetchAdminData('GPK Petang')" style="height: auto; padding: 15px;">
-                            <i class="fas fa-cloud-sun fa-2x has-text-primary"></i><span class="is-size-7 mt-2">GPK PETANG</span>
-                        </button>
-                    </div>
-                </div>
-                <hr>
-            `;
+                    <div class="column is-2" onclick="fetchAdminData('Guru Besar')"><button class="button is-white is-flex-direction-column" style="height: auto; padding: 15px;"><i class="fas fa-user-tie fa-2x has-text-info"></i><span class="is-size-7 mt-2">GB</span></button></div>
+                    <div class="column is-2" onclick="fetchAdminData('GPK Kurikulum')"><button class="button is-white is-flex-direction-column" style="height: auto; padding: 15px;"><i class="fas fa-user-graduate fa-2x has-text-success"></i><span class="is-size-7 mt-2">GPK 1</span></button></div>
+                    <div class="column is-2" onclick="fetchAdminData('GPK HEM')"><button class="button is-white is-flex-direction-column" style="height: auto; padding: 15px;"><i class="fas fa-users-cog fa-2x has-text-warning"></i><span class="is-size-7 mt-2">HEM</span></button></div>
+                    <div class="column is-2" onclick="fetchAdminData('GPK Kokurikulum')"><button class="button is-white is-flex-direction-column" style="height: auto; padding: 15px;"><i class="fas fa-trophy fa-2x has-text-danger"></i><span class="is-size-7 mt-2">KOKO</span></button></div>
+                    <div class="column is-2" onclick="fetchAdminData('GPK Petang')"><button class="button is-white is-flex-direction-column" style="height: auto; padding: 15px;"><i class="fas fa-cloud-sun fa-2x has-text-primary"></i><span class="is-size-7 mt-2">PETANG</span></button></div>
+                </div><hr>`;
         }
 
-        // --- FUNGSI AMBIL DATA DINAMIK BERDASARKAN JAWATAN (LAJUR T) ---
         function fetchAdminData(jawatanPilihan) {
             toggleLoader(true);
             const resultsTable = document.getElementById('resultsTable');
-            
-            // Query: Pilih rekod di mana Lajur T (Jawatan) sama dengan pilihan
             let q = encodeURIComponent(`SELECT S, T, B, C, F, U WHERE T = '${jawatanPilihan}' ORDER BY B DESC`);
             let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
-
             fetch(url).then(r => r.text()).then(t => {
                 let j = JSON.parse(t.substr(47).slice(0,-2));
-                
                 if (!j.table.rows || j.table.rows.length === 0) {
-                    resultsTable.innerHTML = `
-                        <div class="notification is-light has-text-centered py-6">
-                            <i class="fas fa-info-circle fa-2x mb-3"></i><br>
-                            Tiada rekod semakan untuk <strong>${jawatanPilihan}</strong>.
-                        </div>`;
+                    resultsTable.innerHTML = `<div class="notification is-light has-text-centered py-6">Tiada rekod untuk <strong>${jawatanPilihan}</strong>.</div>`;
                     return;
                 }
-
-                let html = `<p class="title is-6 has-text-centered mb-5">REKOD SEMAKAN: ${jawatanPilihan.toUpperCase()}</p>`;
-                html += `<div class="columns is-multiline">`;
-                
+                let html = `<p class="title is-6 has-text-centered mb-5">REKOD: ${jawatanPilihan.toUpperCase()}</p><div class="columns is-multiline">`;
                 j.table.rows.forEach(r => {
-                    let namaPentadbir = r.c[0]?.v || "-";
-                    let jawatan = r.c[1]?.v || "-";
-                    let tarikh = r.c[2] ? (r.c[2].f || r.c[2].v) : "-";
-                    let guru = r.c[3]?.v || "-";
-                    let subjek = r.c[4]?.v || "-";
-                    let link = r.c[5]?.v;
-
-                    html += `
-                        <div class="column is-4">
-                            <div class="admin-card">
-                                <div class="admin-badge">${jawatan}</div>
-                                <p class="is-size-6 has-text-weight-bold" style="color: #1e3a8a;">${namaPentadbir}</p>
-                                <p class="is-size-7 has-text-grey mb-3"><i class="fas fa-calendar-alt mr-1"></i> ${tarikh}</p>
-                                <div style="background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
-                                    <p class="is-size-7"><strong>Guru:</strong><br>${guru}</p>
-                                    <p class="is-size-7 mt-1"><strong>Subjek:</strong><br>${subjek}</p>
-                                </div>
-                                ${link ? `<a href="${link}" target="_blank" class="button is-small is-danger is-fullwidth is-rounded"><i class="fas fa-file-pdf mr-2"></i> LIHAT LAPORAN</a>` : 
-                                `<button class="button is-small is-static is-fullwidth is-rounded">Tiada Fail PDF</button>`}
-                            </div>
-                        </div>`;
+                    let nama = r.c[0]?.v || "-";
+                    let jaw = r.c[1]?.v || "-";
+                    let tar = r.c[2]?.f || r.c[2]?.v || "-";
+                    let gur = r.c[3]?.v || "-";
+                    let sub = r.c[4]?.v || "-";
+                    let lnk = r.c[5]?.v;
+                    html += `<div class="column is-4"><div class="admin-card"><div class="admin-badge">${jaw}</div><p class="is-size-6 has-text-weight-bold" style="color: #1e3a8a;">${nama}</p><p class="is-size-7 has-text-grey mb-3">${tar}</p><div style="background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px;"><p class="is-size-7"><strong>Guru:</strong> ${gur}</p><p class="is-size-7"><strong>Subjek:</strong> ${sub}</p></div>${lnk ? `<a href="${lnk}" target="_blank" class="button is-small is-danger is-fullwidth is-rounded">LIHAT PDF</a>` : `<button class="button is-small is-static is-fullwidth is-rounded">Tiada PDF</button>`}</div></div>`;
                 });
-                
-                html += `</div>`;
-                resultsTable.innerHTML = html;
-                resultsTable.scrollIntoView({ behavior: 'smooth' });
-            })
-            .finally(() => toggleLoader(false));
+                resultsTable.innerHTML = html + `</div>`;
+            }).finally(() => toggleLoader(false));
         }
 
-        // --- FUNGSI ASAL YANG DIKEKALKAN ---
         function drawDashboardStats() {
             toggleLoader(true);
             const qM = encodeURIComponent("SELECT B, COUNT(C) GROUP BY B ORDER BY B DESC LIMIT 7");
@@ -231,9 +206,7 @@
             Promise.all([
                 fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${qM}&sheet=rekod_semakan`),
                 fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${qS}&sheet=rekod_semakan`)
-            ])
-            .then(res => Promise.all(res.map(r => r.text())))
-            .then(texts => {
+            ]).then(res => Promise.all(res.map(r => r.text()))).then(texts => {
                 let j1 = JSON.parse(texts[0].substr(47).slice(0,-2));
                 let d1 = new google.visualization.DataTable();
                 d1.addColumn('string', 'Tarikh'); d1.addColumn('number', 'Rekod');
@@ -250,7 +223,7 @@
 
         function drawTable() {
             const val = document.getElementById('fVal').value;
-            if(!val) return alert("Sila pilih kriteria carian");
+            if(!val) return alert("Sila pilih kriteria");
             toggleLoader(true);
             let q = (currentMode==='GURU') ? `SELECT B, C, F, Q, U WHERE C = '${val}'` : (currentMode==='SUBJEK') ? `SELECT B, C, F, Q, U WHERE F = '${val}'` : `SELECT B, C, F, Q, U WHERE B = '${val.split('-').reverse().join('/')}'`;
             fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(q)}&sheet=rekod_semakan`)
@@ -258,73 +231,49 @@
                 let j = JSON.parse(t.substr(47).slice(0,-2));
                 let dt = new google.visualization.DataTable();
                 dt.addColumn('string', 'Tarikh'); dt.addColumn('string', 'Guru'); dt.addColumn('string', 'Subjek'); dt.addColumn('string', 'Skala'); dt.addColumn('string', 'PDF');
-                dt.addRows(j.table.rows.map(r => [r.c[0] ? (r.c[0].f || r.c[0].v) : "", r.c[1]?.v, r.c[2]?.v, r.c[3]?.v, r.c[4] ? `<a href="${r.c[4].v}" target="_blank" class="button is-small is-link is-outlined">LIHAT PDF</a>` : "Tiada"]));
+                dt.addRows(j.table.rows.map(r => [r.c[0]?.f || r.c[0]?.v || "", r.c[1]?.v, r.c[2]?.v, r.c[3]?.v, r.c[4] ? `<a href="${r.c[4].v}" target="_blank" class="button is-small is-link is-outlined">PDF</a>` : "Tiada"]));
                 new google.visualization.Table(document.getElementById('resultsTable')).draw(dt, {allowHtml:true, width:'100%', pageSize: 10});
             }).finally(() => toggleLoader(false));
         }
 
         function openPdfSearch() {
             const mainArea = document.getElementById('mainArea');
-            mainArea.innerHTML = `
-                <div style="width:100%; max-width:1000px;">
-                    <button class="button is-small is-light mb-4" onclick="location.reload()">← Kembali</button>
-                    <div class="box" style="border-radius: 20px; padding: 30px;">
-                        <h2 class="title is-4 has-text-link"><i class="fas fa-file-pdf mr-2"></i> ARKIB FAIL PDF</h2>
-                        <div class="field has-addons">
-                            <div class="control is-expanded">
-                                <div class="select is-fullwidth is-rounded is-link">
-                                    <select id="pdfSubjectDropdown"><option value="">-- Memuatkan Mata Pelajaran... --</option></select>
-                                </div>
-                            </div>
-                            <div class="control"><button class="button is-link is-rounded px-6" onclick="drawPdfTable()">CARI FAIL</button></div>
-                        </div>
-                        <hr><div id="pdfResultArea" class="has-text-centered py-6"><p class="has-text-grey">Pilih mata pelajaran untuk melihat arkib PDF.</p></div>
-                    </div>
-                </div>`;
+            mainArea.innerHTML = `<div style="width:100%"><button class="button is-small is-light mb-4" onclick="location.reload()">← Kembali</button><div class="box" style="border-radius:20px; padding:30px;"><h2 class="title is-4 has-text-link">ARKIB PDF</h2><div class="field has-addons"><div class="control is-expanded"><div class="select is-fullwidth is-rounded is-link"><select id="pdfSubjectDropdown"><option value="">-- Memuatkan... --</option></select></div></div><div class="control"><button class="button is-link is-rounded px-6" onclick="drawPdfTable()">CARI</button></div></div><hr><div id="pdfResultArea" class="has-text-centered py-6">Pilih subjek.</div></div></div>`;
             fetchPdfSubjects();
         }
 
         function fetchPdfSubjects() {
-            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=tetapan&range=B2:B`;
-            fetch(url).then(r => r.text()).then(t => {
+            fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&sheet=tetapan&range=B2:B`).then(r => r.text()).then(t => {
                 let j = JSON.parse(t.substr(47).slice(0,-2));
                 let dropdown = document.getElementById('pdfSubjectDropdown');
                 dropdown.innerHTML = '<option value="">-- Pilih Mata Pelajaran --</option>';
-                j.table.rows.forEach(r => { if (r.c[0] && r.c[0].v) dropdown.innerHTML += `<option value="${r.c[0].v}">${r.c[0].v}</option>`; });
+                j.table.rows.forEach(r => { if (r.c[0]?.v) dropdown.innerHTML += `<option value="${r.c[0].v}">${r.c[0].v}</option>`; });
             });
         }
 
         function drawPdfTable() {
             const subject = document.getElementById('pdfSubjectDropdown').value;
-            if (!subject) return alert("Sila pilih mata pelajaran");
+            if (!subject) return;
             toggleLoader(true);
-            let q = encodeURIComponent(`SELECT B, C, F, U WHERE F = '${subject}' ORDER BY B DESC`);
-            fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`)
+            fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(`SELECT B, C, F, U WHERE F = '${subject}' ORDER BY B DESC`)}&sheet=rekod_semakan`)
             .then(r => r.text()).then(t => {
                 let j = JSON.parse(t.substr(47).slice(0,-2));
-                if (!j.table.rows || j.table.rows.length === 0) {
-                    document.getElementById('pdfResultArea').innerHTML = `<div class="notification is-warning is-light">Tiada rekod ditemui.</div>`;
-                    return;
-                }
-                let html = `<div class="table-container"><table class="table is-fullwidth is-striped"><thead><tr><th>Tarikh</th><th>Nama Guru</th><th>Fail</th></tr></thead><tbody>`;
-                j.table.rows.forEach(r => {
-                    html += `<tr><td>${r.c[0]?.f || r.c[0]?.v}</td><td>${r.c[1]?.v}</td><td>${r.c[3]?.v ? `<a href="${r.c[3].v}" target="_blank" class="button is-small is-danger is-rounded">Buka</a>` : '-'}</td></tr>`;
-                });
-                html += `</tbody></table></div>`;
-                document.getElementById('pdfResultArea').innerHTML = html;
+                if (!j.table.rows.length) { document.getElementById('pdfResultArea').innerHTML = "Tiada rekod."; return; }
+                let html = `<table class="table is-fullwidth"><thead><tr><th>Tarikh</th><th>Guru</th><th>Fail</th></tr></thead><tbody>`;
+                j.table.rows.forEach(r => { html += `<tr><td>${r.c[0]?.f || r.c[0]?.v}</td><td>${r.c[1]?.v}</td><td>${r.c[3]?.v ? `<a href="${r.c[3].v}" target="_blank" class="button is-small is-danger">Buka</a>` : '-'}</td></tr>`; });
+                document.getElementById('pdfResultArea').innerHTML = html + `</tbody></table>`;
             }).finally(() => toggleLoader(false));
         }
 
         function loadFrame(url) {
-            const mainArea = document.getElementById('mainArea');
-            mainArea.innerHTML = `<div style="width:100%"><button class="button is-small is-light mb-2" onclick="location.reload()">← Kembali</button><iframe src="${url}"></iframe></div>`;
+            document.getElementById('mainArea').innerHTML = `<div style="width:100%"><button class="button is-small is-light mb-2" onclick="location.reload()">← Kembali</button><iframe src="${url}"></iframe></div>`;
         }
 
         function showSearchMenu() {
-            const mainMenu = document.getElementById('mainMenu'), searchMenu = document.getElementById('searchMenu'), statsSection = document.getElementById('statsSection');
-            document.getElementById('headerSection').style.display = 'block';
-            if (statsSection) statsSection.style.display = 'none';
-            mainMenu.style.display = 'none'; searchMenu.style.display = 'flex';
+            const mm = document.getElementById('mainMenu'), sm = document.getElementById('searchMenu'), ss = document.getElementById('statsSection');
+            if(ss) ss.style.display = 'none';
+            if(mm) mm.style.display = 'none'; 
+            sm.style.display = 'flex';
             document.getElementById('filterPanel').style.display = 'none';
         }
 
@@ -332,21 +281,13 @@
             currentMode = mode;
             document.getElementById('filterPanel').style.display = 'block';
             const container = document.getElementById('inputContainer');
-            container.innerHTML = '<p class="is-size-7">Memuatkan data...</p>';
+            container.innerHTML = 'Memuatkan...';
             fetch(scriptURL + "?getLists=true").then(r => r.json()).then(d => {
                 let html = `<div class="columns is-vcentered"><div class="column is-8">`;
-                if (mode === 'GURU') {
-                    let opts = d.guru.map(g => `<option value="${g}">${g}</option>`).join('');
-                    html += `<label class="label is-small">Nama Guru</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Nama --</option>${opts}</select></div>`;
-                } else if (mode === 'SUBJEK') {
-                    let opts = d.subjek.map(s => `<option value="${s}">${s}</option>`).join('');
-                    html += `<label class="label is-small">Mata Pelajaran</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih Subjek --</option>${opts}</select></div>`;
-                } else if (mode === 'TARIKH') {
-                    html += `<label class="label is-small">Tarikh</label><input type="date" id="fVal" class="input">`;
-                }
-                html += `</div><div class="column is-4"><button class="button is-link is-fullwidth is-rounded mt-4" onclick="drawTable()">CARI DATA</button></div></div>`;
-                container.innerHTML = html;
-                document.getElementById('resultsTable').innerHTML = "";
+                if (mode === 'GURU') html += `<label class="label is-small">Nama Guru</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih --</option>${d.guru.map(g => `<option value="${g}">${g}</option>`).join('')}</select></div>`;
+                else if (mode === 'SUBJEK') html += `<label class="label is-small">Subjek</label><div class="select is-fullwidth"><select id="fVal"><option value="">-- Pilih --</option>${d.subjek.map(s => `<option value="${s}">${s}</option>`).join('')}</select></div>`;
+                else if (mode === 'TARIKH') html += `<label class="label is-small">Tarikh</label><input type="date" id="fVal" class="input">`;
+                container.innerHTML = html + `</div><div class="column is-4"><button class="button is-link is-fullwidth is-rounded mt-4" onclick="drawTable()">CARI</button></div></div>`;
             });
         }
 
