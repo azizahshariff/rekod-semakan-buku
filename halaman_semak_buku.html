@@ -7,13 +7,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #f0f2f5; padding: 20px; }
+        body { background-color: #f0f2f5; padding: 20px; font-family: 'Segoe UI', sans-serif; }
         .form-card { background: white; max-width: 800px; margin: auto; padding: 30px; border-radius: 15px; border-top: 10px solid #1e3a8a; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        .label { font-size: 0.85rem; margin-bottom: 0.2rem; }
-        .table select { width: 100%; border: none; background: transparent; font-weight: bold; color: #1e3a8a; }
+        .label { font-size: 0.85rem; margin-bottom: 0.2rem; color: #1e3a8a; }
+        .table select { width: 100%; border: none; background: transparent; font-weight: bold; color: #1e3a8a; cursor: pointer; }
         .has-background-sksr { background-color: #eff6ff; }
-
-        /* --- TAMBAHAN ANIMASI SHAKE --- */
+        
+        /* Navigasi Button Style */
+        .nav-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        
+        /* --- ANIMASI SHAKE --- */
         @keyframes shake {
             0% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
@@ -21,19 +24,26 @@
             75% { transform: translateX(-5px); }
             100% { transform: translateX(0); }
         }
-        .input-error {
-            border: 2px solid #ff3860 !important;
-            animation: shake 0.3s;
-        }
+        .input-error { border: 2px solid #ff3860 !important; animation: shake 0.3s; }
     </style>
 </head>
 <body>
-    <div class="form-card"> <div class="has-text-centered mb-6">
+
+    <div class="form-card">
+        <div class="nav-top">
+            <a href="https://rekod-semakan-buku.vercel.app" class="button is-small is-rounded is-light">
+                <span class="icon"><i class="fas fa-arrow-left"></i></span>
+                <span>Dashboard</span>
+            </a>
+            <span class="tag is-info is-light is-rounded">Aplikasi Pengisian</span>
+        </div>
+
+        <div class="has-text-centered mb-6">
             <div style="margin-bottom: 15px;">
                 <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" alt="Logo SKSR" style="width: 80px; height: auto;">
             </div>
             <div style="line-height: 1.2;">
-                <h2 class="title is-4 is-marginless" style="letter-spacing: 1px;">BORANG SEMAKAN BUKU MURID</h2>
+                <h2 class="title is-4 is-marginless" style="letter-spacing: 1px; color: #1e3a8a;">BORANG SEMAKAN BUKU MURID</h2>
                 <p class="subtitle is-6 has-text-grey mt-2">SK SIMPANG RENGAM</p>
             </div>
             <hr style="margin-top: 1.5rem; background-color: #eee;">
@@ -43,7 +53,14 @@
             <div class="columns is-multiline">
                 <div class="column is-12">
                     <label class="label">Nama Guru</label>
-                    <div class="select is-fullwidth"><select id="namaGuru" required><option value="">Memuatkan senarai...</option></select></div>
+                    <div class="control has-icons-left">
+                        <div class="select is-fullwidth">
+                            <select id="namaGuru" required>
+                                <option value="">Memuatkan senarai...</option>
+                            </select>
+                        </div>
+                        <span class="icon is-small is-left"><i class="fas fa-user"></i></span>
+                    </div>
                 </div>
                 <div class="column is-3">
                     <label class="label">Tahun</label>
@@ -71,7 +88,7 @@
                 <p class="label has-text-centered mb-3">SKOR ASPEK SEMAKAN (1-5)</p>
                 <table class="table is-fullwidth is-bordered is-narrow is-size-7">
                     <thead>
-                        <tr class="has-background-link has-text-white">
+                        <tr style="background-color: #1e3a8a;">
                             <th class="has-text-white">Aspek Penilaian</th>
                             <th class="has-text-white has-text-centered">Skor</th>
                         </tr>
@@ -103,7 +120,7 @@
                 </div>
             </div>
 
-            <button type="submit" id="submitBtn" class="button is-link is-fullwidth is-medium mt-5">
+            <button type="submit" id="submitBtn" class="button is-link is-fullwidth is-medium mt-5" style="background-color: #1e3a8a;">
                 <i class="fas fa-save mr-2"></i> SIMPAN & JANA PDF
             </button>
         </form>
@@ -135,7 +152,6 @@
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             
-            // --- VALIDASI TAMBAHAN ---
             const inputs = document.querySelectorAll('input[required], select[required]');
             let valid = true;
             inputs.forEach(input => {
@@ -146,11 +162,10 @@
                 }
             });
 
-            if (!valid) return; // Henti jika ada yang kosong
+            if (!valid) return;
 
-            // --- JIKA VALID, TERUSKAN SIMPAN ---
             btn.classList.add('is-loading');
-            btn.disabled = true; // Elak tekan banyak kali
+            btn.disabled = true;
 
             const payload = {
                 namaGuru: document.getElementById('namaGuru').value,
