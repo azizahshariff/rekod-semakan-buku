@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Borang Semakan Buku Murid - SK Simpang Rengam</title>
+
+    <link rel="icon" type="image/png" href="logo_sksr.png">
+    <link rel="apple-touch-icon" href="logo_sksr.png">
+    <meta name="theme-color" content="#1e3a8a">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         body { background-color: #f0f2f5; padding: 20px; font-family: 'Segoe UI', sans-serif; }
         .form-card { background: white; max-width: 800px; margin: auto; padding: 30px; border-radius: 15px; border-top: 10px solid #1e3a8a; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
@@ -31,7 +37,7 @@
 
     <div class="form-card">
         <div class="nav-top">
-            <a href="https://rekod-semakan-buku.vercel.app" class="button is-small is-rounded is-light">
+            <a href="/dashboard" class="button is-small is-rounded is-light">
                 <span class="icon"><i class="fas fa-arrow-left"></i></span>
                 <span>Dashboard</span>
             </a>
@@ -40,7 +46,7 @@
 
         <div class="has-text-centered mb-6">
             <div style="margin-bottom: 15px;">
-                <img src="https://raw.githubusercontent.com/azizahshariff/rekod-semakan-buku/main/logo_sksr.png" alt="Logo SKSR" style="width: 80px; height: auto;">
+                <img src="logo_sksr.png" alt="Logo SKSR" style="width: 80px; height: auto;">
             </div>
             <div style="line-height: 1.2;">
                 <h2 class="title is-4 is-marginless" style="letter-spacing: 1px; color: #1e3a8a;">BORANG SEMAKAN BUKU MURID</h2>
@@ -151,7 +157,6 @@
         document.getElementById('semakForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            
             const inputs = document.querySelectorAll('input[required], select[required]');
             let valid = true;
             inputs.forEach(input => {
