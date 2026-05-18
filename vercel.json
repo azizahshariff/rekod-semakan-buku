@@ -1,6 +1,9 @@
 {
+  "version": 2,
   "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
-    { "source": "/borang", "destination": "/halaman_semak_buku.html" }
+    { "source": "/borang", "destination": "/halaman_semak_buku.html" },
+    { "source": "/dashboard", "destination": "/index.html" }
   ]
 }
