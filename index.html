@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rekod Semakan Buku Murid - Pengurusan Kurikulum SK Simpang Rengam</title>
+    <title>Pengurusan Kurikulum - SK Simpang Rengam</title>
 
     <link rel="icon" type="image/png" href="logo_sksr.png">
     <link rel="apple-touch-icon" href="logo_sksr.png">
@@ -82,7 +82,6 @@
         <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit mr-3"></i> Isi Laporan</div>
         <div class="nav-link" onclick="showSearchMenu()"><i class="fas fa-search mr-3"></i> Semak Rekod</div>
         <div class="nav-link" onclick="openPdfSearch()"><i class="fas fa-file-search mr-3"></i> Fail PDF</div>
-        <div class="nav-link" onclick="displayJadualGambar()"><i class="fas fa-calendar-alt mr-3"></i> Jadual Penyeliaan</div>
     </div>
 
     <div class="main-content" id="mainArea">
@@ -131,24 +130,31 @@
             document.getElementById('loader-overlay').style.display = show ? 'flex' : 'none';
         }
 
+        // FUNGSI UNTUK TUKAR PAPARAN KE MENU CARIAN
         function showSearchMenu() {
+            // Jika pengguna berada dalam iframe atau halaman PDF, kita reset mainArea dahulu
             const mainArea = document.getElementById('mainArea');
             if (!document.getElementById('mainMenu')) {
                 location.reload(); 
                 return;
             }
+
             document.getElementById('statsSection').style.display = 'none';
             document.getElementById('mainMenu').style.display = 'none';
             document.getElementById('searchMenu').style.display = 'flex';
             document.getElementById('filterPanel').style.display = 'none';
+            
+            // Update sidebar active state
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('is-active'));
             document.querySelector('div[onclick="showSearchMenu()"]').classList.add('is-active');
         }
 
+        // FUNGSI REKOD PENTADBIR
         function drawAdminRecord() {
             const filterPanel = document.getElementById('filterPanel');
             const inputContainer = document.getElementById('inputContainer');
             const resultsTable = document.getElementById('resultsTable');
+            
             filterPanel.style.display = 'block';
             resultsTable.innerHTML = ""; 
             inputContainer.innerHTML = `
@@ -169,6 +175,7 @@
             const resultsTable = document.getElementById('resultsTable');
             let q = encodeURIComponent(`SELECT S, T, B, C, F, U WHERE T = '${jawatanPilihan}' ORDER BY B DESC`);
             let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
+            
             fetch(url).then(r => r.text()).then(t => {
                 let j = JSON.parse(t.substr(47).slice(0,-2));
                 if (!j.table.rows || j.table.rows.length === 0) {
@@ -271,25 +278,6 @@
                 else if (mode === 'TARIKH') html += `<label class="label is-small">Tarikh</label><input type="date" id="fVal" class="input">`;
                 container.innerHTML = html + `</div><div class="column is-4"><button class="button is-link is-fullwidth is-rounded mt-4" onclick="drawTable()">CARI</button></div></div>`;
             });
-        }
-
-        // FUNGSI KHUSUS UNTUK PAPARAN GAMBAR JADUAL
-        function displayJadualGambar() {
-            const mainArea = document.getElementById('mainArea');
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('is-active'));
-            if(event && event.currentTarget) event.currentTarget.classList.add('is-active');
-
-            let html = `
-                <div style="width:100%; max-width:1000px; text-align: center;">
-                    <div class="is-flex is-justify-content-start mb-4">
-                        <button class="button is-small is-light" onclick="location.reload()">← Kembali</button>
-                    </div>
-                    <div class="box" style="border-radius:20px; padding:10px; background: white;">
-                        <img src="jadual_penyeliaan.png" alt="Jadual Penyeliaan" style="width:100%; border-radius:10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                    </div>
-                </div>
-            `;
-            mainArea.innerHTML = html;
         }
     </script>
 </body>
