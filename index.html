@@ -3,14 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengurusan Kurikulum - SK Simpang Rengam</title>
+    <title>Rekod Semakan Buku Murid - SK Simpang Rengam</title>
 
     <link rel="icon" type="image/png" href="logo_sksr.png">
-    <link rel="apple-touch-icon" href="logo_sksr.png">
-    <meta name="theme-color" content="#1e3a8a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -77,11 +72,12 @@
             <p style="font-weight: 700; color: var(--primary); font-size: 0.85rem; margin-top: 10px;">REKOD SEMAKAN BUKU MURID</p>
             <p class="subtitle is-6 has-text-grey">SK Simpang Rengam</p>
         </div>
-        <div class="nav-link is-active" onclick="location.reload()"><i class="fas fa-home mr-3"></i> Laman Utama</div>
+        <div class="nav-link is-active" id="navHome" onclick="location.reload()"><i class="fas fa-home mr-3"></i> Laman Utama</div>
         <div class="nav-group-title">Menu Utama</div>
         <div class="nav-link" onclick="loadFrame('halaman_semak_buku.html')"><i class="fas fa-edit mr-3"></i> Isi Laporan</div>
-        <div class="nav-link" onclick="showSearchMenu()"><i class="fas fa-search mr-3"></i> Semak Rekod</div>
+        <div class="nav-link" id="navSearch" onclick="showSearchMenu()"><i class="fas fa-search mr-3"></i> Semak Rekod</div>
         <div class="nav-link" onclick="openPdfSearch()"><i class="fas fa-file-search mr-3"></i> Fail PDF</div>
+        <div class="nav-link" id="navJadual" onclick="displayJadualGambar()"><i class="fas fa-calendar-alt mr-3"></i> Jadual Penyeliaan</div>
     </div>
 
     <div class="main-content" id="mainArea">
@@ -127,40 +123,69 @@
         google.charts.setOnLoadCallback(drawDashboardStats);
 
         function toggleLoader(show) {
-            document.getElementById('loader-overlay').style.display = show ? 'flex' : 'none';
+            const loader = document.getElementById('loader-overlay');
+            if(loader) loader.style.display = show ? 'flex' : 'none';
         }
 
-        // FUNGSI UNTUK TUKAR PAPARAN KE MENU CARIAN
         function showSearchMenu() {
-            // Jika pengguna berada dalam iframe atau halaman PDF, kita reset mainArea dahulu
-            const mainArea = document.getElementById('mainArea');
-            if (!document.getElementById('mainMenu')) {
-                location.reload(); 
-                return;
-            }
-
-            document.getElementById('statsSection').style.display = 'none';
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('searchMenu').style.display = 'flex';
-            document.getElementById('filterPanel').style.display = 'none';
-            
-            // Update sidebar active state
+            // Reset Sidebar Active State
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('is-active'));
-            document.querySelector('div[onclick="showSearchMenu()"]').classList.add('is-active');
+            document.getElementById('navSearch').classList.add('is-active');
+
+            const mainArea = document.getElementById('mainArea');
+            
+            // Periksa jika elemen carian wujud, jika tidak, bina semula (untuk kes tukar dari Jadual ke Semak)
+            if (!document.getElementById('searchMenu')) {
+                mainArea.innerHTML = `
+                    <div id="headerSection" style="display:none"></div>
+                    <div id="statsSection" style="display:none"></div>
+                    <div class="card-menu" id="mainMenu" style="display:none"></div>
+                    <div class="card-menu" id="searchMenu" style="display:flex">
+                        <div class="menu-item" onclick="prepareFilter('GURU')"><i class="fas fa-user-tie has-text-link"></i><span>NAMA GURU</span></div>
+                        <div class="menu-item" onclick="prepareFilter('SUBJEK')"><i class="fas fa-book has-text-success"></i><span>MATA PELAJARAN</span></div>
+                        <div class="menu-item" onclick="prepareFilter('TARIKH')"><i class="fas fa-calendar-day has-text-warning"></i><span>TARIKH</span></div>
+                        <div class="menu-item" onclick="drawAdminRecord()"><i class="fas fa-user-shield has-text-primary"></i><span>REKOD PENTADBIR</span></div>
+                        <div style="width: 100%; text-align: center; margin-top: 20px;"><button class="button is-text is-small" onclick="location.reload()"> Kembali ke Menu Utama</button></div>
+                    </div>
+                    <div id="filterPanel">
+                        <div id="inputContainer"></div>
+                        <div id="resultsTable" class="mt-5"></div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('headerSection').style.display = 'none';
+                document.getElementById('statsSection').style.display = 'none';
+                document.getElementById('mainMenu').style.display = 'none';
+                document.getElementById('searchMenu').style.display = 'flex';
+                document.getElementById('filterPanel').style.display = 'none';
+            }
         }
 
-        // FUNGSI REKOD PENTADBIR
-        function drawAdminRecord() {
-            const filterPanel = document.getElementById('filterPanel');
-            const inputContainer = document.getElementById('inputContainer');
-            const resultsTable = document.getElementById('resultsTable');
-            
-            filterPanel.style.display = 'block';
-            resultsTable.innerHTML = ""; 
-            inputContainer.innerHTML = `
-                <div class="notification is-link is-light mb-5 has-text-centered">
-                    <p class="is-size-7"><strong>SILA PILIH PENTADBIR</strong></p>
+        function displayJadualGambar() {
+            const mainArea = document.getElementById('mainArea');
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('is-active'));
+            document.getElementById('navJadual').classList.add('is-active');
+
+            mainArea.innerHTML = `
+                <div style="width:100%; max-width:1000px; text-align: center;">
+                    <div class="is-flex is-justify-content-start mb-4">
+                        <button class="button is-small is-light" onclick="location.reload()">← Kembali</button>
+                    </div>
+                    <div class="box" style="border-radius:20px; padding:10px; background: white;">
+                        <img src="jadual_penyeliaan.png" 
+                             alt="Jadual Penyeliaan" 
+                             style="width:100%; border-radius:10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"
+                             onerror="this.parentElement.innerHTML='<div class=notification>Fail <b>jadual_penyeliaan.png</b> tidak ditemui. Sila pastikan nama fail betul di GitHub/Vercel.</div>'">
+                    </div>
                 </div>
+            `;
+        }
+
+        function drawAdminRecord() {
+            document.getElementById('filterPanel').style.display = 'block';
+            document.getElementById('resultsTable').innerHTML = ""; 
+            document.getElementById('inputContainer').innerHTML = `
+                <div class="notification is-link is-light mb-5 has-text-centered"><p class="is-size-7"><strong>SILA PILIH PENTADBIR</strong></p></div>
                 <div class="columns is-mobile is-multiline is-centered">
                     <div class="column is-2" onclick="fetchAdminData('Guru Besar')"><button class="button is-white is-flex-direction-column" style="height: auto; padding: 15px;"><i class="fas fa-user-tie fa-2x has-text-info"></i><span class="is-size-7 mt-2">GB</span></button></div>
                     <div class="column is-2" onclick="fetchAdminData('GPK Kurikulum')"><button class="button is-white is-flex-direction-column" style="height: auto; padding: 15px;"><i class="fas fa-user-graduate fa-2x has-text-success"></i><span class="is-size-7 mt-2">GPK 1</span></button></div>
@@ -172,25 +197,15 @@
 
         function fetchAdminData(jawatanPilihan) {
             toggleLoader(true);
-            const resultsTable = document.getElementById('resultsTable');
             let q = encodeURIComponent(`SELECT S, T, B, C, F, U WHERE T = '${jawatanPilihan}' ORDER BY B DESC`);
-            let url = `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`;
-            
-            fetch(url).then(r => r.text()).then(t => {
+            fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${q}&sheet=rekod_semakan`)
+            .then(r => r.text()).then(t => {
                 let j = JSON.parse(t.substr(47).slice(0,-2));
-                if (!j.table.rows || j.table.rows.length === 0) {
-                    resultsTable.innerHTML = `<div class="notification is-light has-text-centered py-6">Tiada rekod untuk <strong>${jawatanPilihan}</strong>.</div>`;
-                    return;
-                }
+                let resultsTable = document.getElementById('resultsTable');
+                if (!j.table.rows.length) { resultsTable.innerHTML = `<div class="notification is-light has-text-centered py-6">Tiada rekod untuk <strong>${jawatanPilihan}</strong>.</div>`; return; }
                 let html = `<p class="title is-6 has-text-centered mb-5">REKOD: ${jawatanPilihan.toUpperCase()}</p><div class="columns is-multiline">`;
                 j.table.rows.forEach(r => {
-                    let nama = r.c[0]?.v || "-";
-                    let jaw = r.c[1]?.v || "-";
-                    let tar = r.c[2]?.f || r.c[2]?.v || "-";
-                    let gur = r.c[3]?.v || "-";
-                    let sub = r.c[4]?.v || "-";
-                    let lnk = r.c[5]?.v;
-                    html += `<div class="column is-4"><div class="admin-card"><div class="admin-badge">${jaw}</div><p class="is-size-6 has-text-weight-bold" style="color: #1e3a8a;">${nama}</p><p class="is-size-7 has-text-grey mb-3">${tar}</p><div style="background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px;"><p class="is-size-7"><strong>Guru:</strong> ${gur}</p><p class="is-size-7"><strong>Subjek:</strong> ${sub}</p></div>${lnk ? `<a href="${lnk}" target="_blank" class="button is-small is-danger is-fullwidth is-rounded">LIHAT PDF</a>` : `<button class="button is-small is-static is-fullwidth is-rounded">Tiada PDF</button>`}</div></div>`;
+                    html += `<div class="column is-4"><div class="admin-card"><div class="admin-badge">${r.c[1]?.v}</div><p class="is-size-6 has-text-weight-bold" style="color: #1e3a8a;">${r.c[0]?.v}</p><p class="is-size-7 has-text-grey mb-3">${r.c[2]?.f || r.c[2]?.v}</p><div style="background: #f8fafc; padding: 10px; border-radius: 8px; margin-bottom: 15px;"><p class="is-size-7"><strong>Guru:</strong> ${r.c[3]?.v}</p><p class="is-size-7"><strong>Subjek:</strong> ${r.c[4]?.v}</p></div>${r.c[5]?.v ? `<a href="${r.c[5].v}" target="_blank" class="button is-small is-danger is-fullwidth is-rounded">LIHAT PDF</a>` : `<button class="button is-small is-static is-fullwidth is-rounded">Tiada PDF</button>`}</div></div>`;
                 });
                 resultsTable.innerHTML = html + `</div>`;
             }).finally(() => toggleLoader(false));
@@ -215,7 +230,7 @@
                 d2.addColumn('string', 'Subjek'); d2.addColumn('number', 'Jumlah');
                 j2.table.rows.forEach(r => d2.addRow([r.c[0].v, r.c[1].v]));
                 new google.visualization.PieChart(document.getElementById('chartSubjek')).draw(d2, { pieHole: 0.4, colors: ['#1e3a8a', '#ef4444', '#f59e0b', '#10b981', '#6366f1'], chartArea: {width: '100%', height: '80%'}, legend: {position: 'bottom', textStyle: {fontSize: 10}} });
-            }).finally(() => toggleLoader(false));
+            }).catch(e => console.log("Stats error")).finally(() => toggleLoader(false));
         }
 
         function drawTable() {
@@ -234,8 +249,7 @@
         }
 
         function openPdfSearch() {
-            const mainArea = document.getElementById('mainArea');
-            mainArea.innerHTML = `<div style="width:100%"><button class="button is-small is-light mb-4" onclick="location.reload()">← Kembali</button><div class="box" style="border-radius:20px; padding:30px;"><h2 class="title is-4 has-text-link">ARKIB PDF</h2><div class="field has-addons"><div class="control is-expanded"><div class="select is-fullwidth is-rounded is-link"><select id="pdfSubjectDropdown"><option value="">-- Memuatkan... --</option></select></div></div><div class="control"><button class="button is-link is-rounded px-6" onclick="drawPdfTable()">CARI</button></div></div><hr><div id="pdfResultArea" class="has-text-centered py-6">Pilih subjek.</div></div></div>`;
+            document.getElementById('mainArea').innerHTML = `<div style="width:100%"><button class="button is-small is-light mb-4" onclick="location.reload()">← Kembali</button><div class="box" style="border-radius:20px; padding:30px;"><h2 class="title is-4 has-text-link">ARKIB PDF</h2><div class="field has-addons"><div class="control is-expanded"><div class="select is-fullwidth is-rounded is-link"><select id="pdfSubjectDropdown"><option value="">-- Memuatkan... --</option></select></div></div><div class="control"><button class="button is-link is-rounded px-6" onclick="drawPdfTable()">CARI</button></div></div><hr><div id="pdfResultArea" class="has-text-centered py-6">Pilih subjek.</div></div></div>`;
             fetchPdfSubjects();
         }
 
@@ -255,7 +269,6 @@
             fetch(`https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?tqx=out:json&tq=${encodeURIComponent(`SELECT B, C, F, U WHERE F = '${subject}' ORDER BY B DESC`)}&sheet=rekod_semakan`)
             .then(r => r.text()).then(t => {
                 let j = JSON.parse(t.substr(47).slice(0,-2));
-                if (!j.table.rows.length) { document.getElementById('pdfResultArea').innerHTML = "Tiada rekod."; return; }
                 let html = `<table class="table is-fullwidth"><thead><tr><th>Tarikh</th><th>Guru</th><th>Fail</th></tr></thead><tbody>`;
                 j.table.rows.forEach(r => { html += `<tr><td>${r.c[0]?.f || r.c[0]?.v}</td><td>${r.c[1]?.v}</td><td>${r.c[3]?.v ? `<a href="${r.c[3].v}" target="_blank" class="button is-small is-danger">Buka</a>` : '-'}</td></tr>`; });
                 document.getElementById('pdfResultArea').innerHTML = html + `</tbody></table>`;
