@@ -57,7 +57,7 @@
 
         <form id="semakForm">
             <div class="columns is-multiline">
-                <div class="column is-12">
+                <div class="column is-8">
                     <label class="label">Nama Guru</label>
                     <div class="control has-icons-left">
                         <div class="select is-fullwidth">
@@ -68,6 +68,15 @@
                         <span class="icon is-small is-left"><i class="fas fa-user"></i></span>
                     </div>
                 </div>
+
+                <div class="column is-4">
+                    <label class="label">Tarikh Semakan</label>
+                    <div class="control has-icons-left">
+                        <input class="input" type="date" id="tarikhSemakan" required>
+                        <span class="icon is-small is-left"><i class="fas fa-calendar-alt"></i></span>
+                    </div>
+                </div>
+
                 <div class="column is-3">
                     <label class="label">Tahun</label>
                     <div class="select is-fullwidth"><select id="tahun" required></select></div>
@@ -133,9 +142,13 @@
     </div>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyJkmYgJXzojMmEgVHuh-aR8GkegycSjAP-Avn_Xw7H0kr13IbVUTiUmNH6Fx-imLMf0A/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxuR5lnCu7rBCUzIyul2G8Unf77u5LiQjBs6dS3iMIY8DxyCsSTKzU_C7fpPLO2HDAxeQ/exec';
 
         window.onload = function() {
+            // Set automatik tarikh hari ini ke dalam kotak input sebagai default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('tarikhSemakan').value = today;
+
             fetch(scriptURL + "?getLists=true")
             .then(res => res.json())
             .then(data => {
@@ -173,6 +186,7 @@
             btn.disabled = true;
 
             const payload = {
+                tarikhSemakan: document.getElementById('tarikhSemakan').value, // Menghantar nilai tarikh yang dipilih manual
                 namaGuru: document.getElementById('namaGuru').value,
                 tahun: document.getElementById('tahun').value,
                 kelas: document.getElementById('kelas').value,
